@@ -15,4 +15,8 @@ public interface Segment {
     public void reset();
 
     public void setName(String newName);
+
+    public Segment getParent();
+
+    public int getLayer();
 }

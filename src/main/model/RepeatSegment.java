@@ -7,14 +7,20 @@ public class RepeatSegment implements Segment, SegmentList {
     private String name;
     private int numRepeats;
     private final List<Segment> children; // will always have at least 1 child
+    private final int layer;
+    private final Segment parent;
 
     private int currentCycle;
 
-    public RepeatSegment(String name, int numRepeats, List<Segment> children) {
+    // parent can be null only if the root routine
+    // children must have been initalised with this RepeatSegment as parent
+    public RepeatSegment(String name, int numRepeats, List<Segment> children, Segment parent) {
         this.name = name;
         this.numRepeats = numRepeats;
         this.children = children;
+        this.parent = parent;
 
+        layer = parent == null ? 0 : parent.getLayer() + 1;
         currentCycle = 1;
     }
 
@@ -71,6 +77,16 @@ public class RepeatSegment implements Segment, SegmentList {
     @Override
     public void setName(String newName) {
         name = newName;
+    }
+
+    @Override
+    public Segment getParent() {
+        return this.parent;
+    }
+
+    @Override
+    public int getLayer() {
+        return this.layer;
     }
 
     // SegmentList methods
