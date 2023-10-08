@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Routine implements SegmentList {
     private String name;
-    private List<Segment> segments;
+    private final List<Segment> segments;
     // has a flattened numbering system that includes all segments in order, including subsegments of repeat ones
 
 
@@ -29,9 +29,22 @@ public class Routine implements SegmentList {
         // TODO
     }
 
+    public void advance(long milliseconds) {
+        if (isComplete()) {
+            return;
+        }
+        Segment currentSegment = getExactCurrentSegment();
+        if (currentSegment.getType().equals("time")) {
+            long remainingTime = ((TimeSegment) currentSegment).addTime(milliseconds);
+            if (remainingTime != 0) {
+                advance(remainingTime);
+            }
+        }
+    }
+
     //public void modifySegment(int index)
 
-    // requires segments is not empty, isComplete() is false
+    // requires isComplete() is false
     // the actual subsegment in a repeat
     public Segment getExactCurrentSegment() {
         Segment exactCurrentSegment = getCurrentSegment();
@@ -71,7 +84,7 @@ public class Routine implements SegmentList {
         return allSegments;
     }
 
-    // requires that segments is not empty, isComplete() is false
+    // requires that isComplete() is false
     @Override
     public Segment getCurrentSegment() {
         for (Segment segment : segments) {
