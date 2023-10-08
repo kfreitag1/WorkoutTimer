@@ -1,19 +1,16 @@
 package ui;
 
 import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.TextGraphics;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-import com.googlecode.lanterna.terminal.Terminal;
-import model.ManualSegment;
-import model.Routine;
-import model.Segment;
+import model.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,7 +97,8 @@ public class TerminalWorkoutTimerApp {
 
         switch (stroke.getCharacter()) {
             case 'n': // new
-                newRoutineRoutine();
+                activeRoutine = makeRoutineFromInput();
+                applicationState = "routine";
                 break;
             case 'l': // load
                 break;
@@ -110,14 +108,13 @@ public class TerminalWorkoutTimerApp {
         return true;
     }
 
-    private void newRoutineRoutine() throws IOException {
+    private Routine makeRoutineFromInput() throws IOException {
         String name = getStringWithValidation(
                 "Routine name: ",
                 "Name cannot be empty",
                 "\\S+");
 
-        activeRoutine = new Routine(name);
-        applicationState = "routine";
+        return new Routine(name);
     }
 
     // handles input for the routine application state
@@ -131,17 +128,22 @@ public class TerminalWorkoutTimerApp {
                 // ensure isComplete = false before going to
                 break;
             case 'r': // load
+                // TODO
                 break;
             case 'a': // add
-                addSegmentRoutine();
+                activeRoutine.addSegment(makeSegmentFromInput());
                 break;
             case 'd': // delete
+                // TODO
                 break;
             case 'e': // edit
+                // TODO
                 break;
             case 'c': // close
+                // TODO
                 break;
             case 's': // save
+                // TODO
                 break;
             case 'q': // quit
                 return false;
@@ -149,18 +151,34 @@ public class TerminalWorkoutTimerApp {
         return true;
     }
 
-    private void addSegmentRoutine() throws IOException {
+    private Segment makeSegmentFromInput() throws IOException {
         String name = getStringWithValidation(
-                "Segment name: ",
-                "Name cannot be empty",
-                "\\S+");
+                "Segment name: ", "Name cannot be empty", "\\S+");
 
         String type = getStringWithValidation(
                 "Segment type: (t)imed, (r)epeat, (m)anual ",
-                "Type is not one of 't', 'r', or 'm'",
-                "[trm]");
+                "Type is not one of 't', 'r', or 'm'", "[trm]");
 
-        Long time = getTimeWithValidation();
+        switch (type) {
+            case "t": // make TimeSegment
+                long milliseconds = getTimeWithValidation();
+                return new TimeSegment(name, milliseconds);
+            case "r":
+                int numRepeats = getIntegerWithValidation(
+                        "Number of repetitions (1-99): ",
+                        "Invalid input (not an integer between 1 and 99)", "^[1-9][0-9]?$");
+
+                List<Segment> children = new ArrayList<>();
+                do { // adds at least one child
+                    children.add(makeSegmentFromInput());
+                } while (getBooleanWithValidation("Add another segment? (y/n) "));
+
+                return new RepeatSegment(name, numRepeats, children);
+            case "m":
+                return new ManualSegment(name);
+            default:
+                return new ManualSegment("INVALID"); // Will never reach here
+        }
     }
 
     // handles input for the running application state
@@ -229,13 +247,18 @@ public class TerminalWorkoutTimerApp {
         return value;
     }
 
+    // same above but with generic regex condition
     private int getIntegerWithValidation(String prompt, String errorMessage) throws IOException {
+        return getIntegerWithValidation(prompt, errorMessage, "^\\d+$");
+    }
+
+    private int getIntegerWithValidation(String prompt, String errorMessage, String regex) throws IOException {
         String value;
         String currentErrorMessage = "";
         while (true) {
-            value = getCommandWithRenderDisplay("Name: ", currentErrorMessage);
+            value = getCommandWithRenderDisplay(prompt, currentErrorMessage);
             value = value.trim();
-            if (!value.matches("^\\d+$")) {
+            if (!value.matches(regex)) {
                 currentErrorMessage = errorMessage;
             } else {
                 break;
@@ -269,6 +292,21 @@ public class TerminalWorkoutTimerApp {
                 return ((minutes * 60) + seconds) * 1000;
             }
         }
+    }
+
+    private boolean getBooleanWithValidation(String prompt) throws IOException {
+        String value;
+        String errorMessage = "";
+        while (true) {
+            value = getCommandWithRenderDisplay(prompt, errorMessage);
+            value = value.trim().toLowerCase();
+            if (!value.matches("[yn]")) {
+                errorMessage = "Invalid input (not y or n)";
+            } else {
+                break;
+            }
+        }
+        return value.equals("y");
     }
 
     // Private render methods
