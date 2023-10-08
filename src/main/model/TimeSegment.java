@@ -6,16 +6,10 @@ public class TimeSegment implements Segment {
     private String name;
     private long totalTime;
     private long currentTime;
-    private final Segment parent;
-    private final int layer;
 
-    // parent can be null if root routine
-    public TimeSegment(String name, long totalTime, Segment parent) {
+    public TimeSegment(String name, long totalTime) {
         this.name = name;
         this.totalTime = totalTime;
-        this.parent = parent;
-
-        layer = parent == null ? 0 : parent.getLayer() + 1;
         currentTime = 0;
     }
 
@@ -65,15 +59,5 @@ public class TimeSegment implements Segment {
     @Override
     public void setName(String newName) {
         this.name = newName;
-    }
-
-    @Override
-    public Segment getParent() {
-        return this.parent;
-    }
-
-    @Override
-    public int getLayer() {
-        return this.layer;
     }
 }

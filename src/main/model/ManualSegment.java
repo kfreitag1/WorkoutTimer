@@ -3,16 +3,9 @@ package model;
 public class ManualSegment implements Segment {
     private String name;
     private boolean finished = false;
-    private final Segment parent;
-    private final int layer;
 
-    // parent is null if root routine
-    public ManualSegment(String name, Segment parent) {
+    public ManualSegment(String name) {
         this.name = name;
-        this.parent = parent;
-
-        layer = parent == null ? 0 : parent.getLayer() + 1;
-
     }
 
     public void setComplete() {
@@ -45,15 +38,5 @@ public class ManualSegment implements Segment {
     @Override
     public void setName(String newName) {
         name = newName;
-    }
-
-    @Override
-    public Segment getParent() {
-        return parent;
-    }
-
-    @Override
-    public int getLayer() {
-        return layer;
     }
 }
