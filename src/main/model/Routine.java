@@ -29,6 +29,11 @@ public class Routine implements SegmentList {
         // TODO
     }
 
+    // requires that afterSegment is in segments
+    public void insertSegmentAfter(Segment newSegment, Segment segmentAfterInserted) {
+        // TODO
+    }
+
     // requires that segment is in segments
     // if it was an only child of a RepeatSegment, remove the parent too
     public void removeSegment(Segment segment) {
@@ -56,11 +61,6 @@ public class Routine implements SegmentList {
 
         // If removed parent segment without any children, check if you need to remove one layer up too
         return segmentList.remove(parentToRemove);
-    }
-
-    // requires that segmentToReplace is in segments
-    public void replaceSegment(Segment newSegment, Segment segmentToReplace) {
-        // TODO
     }
 
     public void advance(long milliseconds) {

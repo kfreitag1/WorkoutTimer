@@ -22,7 +22,6 @@ public class TerminalWorkoutTimerApp {
     private static final TextColor COLOUR_COMPLETE = new TextColor.RGB(143, 242, 107);
     private static final TextColor COLOUR_ACTIVE = new TextColor.RGB(50, 200, 235);
 
-
     private Screen screen;
     private TerminalSize terminalSize;
 
@@ -84,6 +83,32 @@ public class TerminalWorkoutTimerApp {
         return keepGoing;
     }
 
+    // requires newState is one of "main_menu", "routine", "running"
+    // returns whether successful or not
+    private boolean changeApplicationState(String newState) {
+        switch (newState) {
+            case "main_menu":
+                activeRoutine = null;
+                applicationState = "main_menu";
+                break;
+            case "routine":
+                if (activeRoutine != null) {
+                    applicationState = "routine";
+                    return true;
+                } else {
+                    return false;
+                }
+            case "running":
+                if (activeRoutine != null && !activeRoutine.getSegments().isEmpty()) {
+                    applicationState = "running";
+                    return true;
+                } else {
+                    return false;
+                }
+        }
+        return false; // Will never reach here
+    }
+
     // --------------------------------------------------------------------------------------------
     // Private user input methods
     // --------------------------------------------------------------------------------------------
@@ -115,7 +140,7 @@ public class TerminalWorkoutTimerApp {
         switch (stroke.getCharacter()) {
             case 'n': // new
                 activeRoutine = makeRoutineFromInput();
-                applicationState = "routine";
+                changeApplicationState("routine");
                 break;
             case 'l': // load
                 break;
@@ -135,6 +160,7 @@ public class TerminalWorkoutTimerApp {
     }
 
     // handles input for the routine application state
+    @SuppressWarnings({"checkstyle:MethodLength", "checkstyle:SuppressWarnings"})
     private boolean handleUserInputRoutine(KeyStroke stroke) throws IOException {
         if (!stroke.getKeyType().equals(KeyType.Character)) {
             return true;
@@ -142,32 +168,28 @@ public class TerminalWorkoutTimerApp {
 
         switch (stroke.getCharacter()) {
             case 'p': // play
-                if (!activeRoutine.getSegments().isEmpty()) {
-                    applicationState = "running";
-                }
+                changeApplicationState("running");
                 break;
             case 'r': // restart
                 activeRoutine.reset();
-                break;
-            case 'l': // load
-                // TODO
                 break;
             case 'a': // add
                 activeRoutine.addSegment(makeSegmentFromInput());
                 break;
             case 'd': // delete
-                // TODO
                 deleteSegment();
                 break;
             case 'e': // edit
-                // TODO
+                editSegment();
                 break;
             case 'c': // close
                 // TODO : ask user to save before closing
-                activeRoutine = null;
-                applicationState = "main_menu";
+                changeApplicationState("main_menu");
                 break;
             case 's': // save
+                // TODO
+                break;
+            case 'l': // load
                 // TODO
                 break;
             case 'q': // quit
@@ -189,7 +211,8 @@ public class TerminalWorkoutTimerApp {
                 long milliseconds = getTimeWithValidation();
                 return new TimeSegment(name, milliseconds);
             case "r":
-                int numRepeats = getIntegerWithValidation("Number of repetitions (1-99): ", 1, 99);
+                int numRepeats = getIntegerWithValidation(
+                        "Number of repetitions (1 - 1000): ", 1, 1000);
 
                 List<Segment> children = new ArrayList<>();
                 do { // adds at least one child
@@ -208,13 +231,45 @@ public class TerminalWorkoutTimerApp {
         if (activeRoutine.getSegments().isEmpty()) {
             return;
         }
+        Segment segmentToRemove = getSegmentAtIndexFromInput("Enter index of segment to delete: ");
+        activeRoutine.removeSegment(segmentToRemove);
+    }
+
+    private void editSegment() throws IOException {
+        if (activeRoutine.getSegments().isEmpty()) {
+            return;
+        }
+        Segment segmentToEdit = getSegmentAtIndexFromInput("Enter index of segment to edit: ");
+        segmentToEdit.setName(getStringWithValidation(
+                "New segment name: ", "Name cannot be empty",
+                ".+", segmentToEdit.getName()));
+        switch (segmentToEdit.getType()) {
+            case "time":
+                TimeSegment timeSegment = (TimeSegment) segmentToEdit;
+                timeSegment.setTotalTime(getTimeWithValidation());
+                break;
+            case "repeat":
+                RepeatSegment repeatSegment = (RepeatSegment) segmentToEdit;
+                repeatSegment.setNewRepeats(getIntegerWithValidation("New number of repetitions (1 to 1000): ",
+                        1, 1000, Integer.toString(repeatSegment.getTotalRepetitions())));
+                break;
+        }
+    }
+
+    // requires getSegments() is not empty
+    private Segment getSegmentAtIndexFromInput(String prompt) throws IOException {
+        // Make the render function add in indices beside each index
         displaySegmentIndices = true;
+
         List<Segment> flattenedSegments = activeRoutine.getFlattenedSegments();
-        int indexToDelete = getIntegerWithValidation(
-                "Choose index to delete: (" + 0 + " to " + (flattenedSegments.size() - 1) + "): ",
+        int segmentIndex = getIntegerWithValidation(
+                prompt + "(" + 0 + " to " + (flattenedSegments.size() - 1) + "): ",
                 0, (flattenedSegments.size() - 1));
-        activeRoutine.removeSegment(flattenedSegments.get(indexToDelete));
+
+        // Stop displaying the segment indices
         displaySegmentIndices = false;
+
+        return flattenedSegments.get(segmentIndex);
     }
 
     // handles input for the running application state
@@ -244,10 +299,17 @@ public class TerminalWorkoutTimerApp {
         return getCommandWithRenderDisplay(prompt, "");
     }
 
-    private String getCommandWithRenderDisplay(String prompt, String errorMessage) throws IOException {
+    private String getCommandWithRenderDisplay(String prompt,
+                                               String errorMessage) throws IOException {
+        return getCommandWithRenderDisplay(prompt, errorMessage, "");
+    }
+
+    private String getCommandWithRenderDisplay(String prompt,
+                                               String errorMessage,
+                                               String defaultInput) throws IOException {
         // Set prompt to global environment
         this.commandPrompt = prompt;
-        this.commandInput = "";
+        this.commandInput = defaultInput;
         this.commandError = errorMessage;
 
         // exits when the enter key is pressed
@@ -272,11 +334,20 @@ public class TerminalWorkoutTimerApp {
         }
     }
 
-    private String getStringWithValidation(String prompt, String errorMessage, String regex) throws IOException {
+    private String getStringWithValidation(String prompt,
+                                           String errorMessage,
+                                           String regex) throws IOException {
+        return getStringWithValidation(prompt, errorMessage, regex, "");
+    }
+
+    private String getStringWithValidation(String prompt,
+                                           String errorMessage,
+                                           String regex,
+                                           String defaultInput) throws IOException {
         String value;
         String currentErrorMessage = "";
         while (true) {
-            value = getCommandWithRenderDisplay(prompt, currentErrorMessage);
+            value = getCommandWithRenderDisplay(prompt, currentErrorMessage, defaultInput);
             value = value.trim();
             if (!value.matches(regex)) {
                 currentErrorMessage = errorMessage;
@@ -288,11 +359,14 @@ public class TerminalWorkoutTimerApp {
     }
 
     // same above but with generic regex condition
-    private int getIntegerWithValidation(String prompt, String errorMessage) throws IOException {
+    private int getIntegerWithValidation(String prompt,
+                                         String errorMessage) throws IOException {
         return getIntegerWithValidation(prompt, errorMessage, "^\\d+$");
     }
 
-    private int getIntegerWithValidation(String prompt, String errorMessage, String regex) throws IOException {
+    private int getIntegerWithValidation(String prompt,
+                                         String errorMessage,
+                                         String regex) throws IOException {
         String value;
         String currentErrorMessage = "";
         while (true) {
@@ -307,11 +381,18 @@ public class TerminalWorkoutTimerApp {
         return Integer.parseInt(value);
     }
 
-    private int getIntegerWithValidation(String prompt, int min, int max) throws IOException {
+    private int getIntegerWithValidation(String prompt,
+                                         int min, int max) throws IOException {
+        return getIntegerWithValidation(prompt, min, max, "");
+    }
+
+    private int getIntegerWithValidation(String prompt,
+                                         int min, int max,
+                                         String defaultInput) throws IOException {
         String value;
         String currentErrorMessage = "";
         while (true) {
-            value = getCommandWithRenderDisplay(prompt, currentErrorMessage);
+            value = getCommandWithRenderDisplay(prompt, currentErrorMessage, defaultInput);
             value = value.trim();
             if (!value.matches("^\\d+$")) {
                 currentErrorMessage = "Value is not in the range from " + min + " to " + max;
@@ -445,8 +526,8 @@ public class TerminalWorkoutTimerApp {
     private void renderRoutine(Screen screen) {
         TerminalPosition position = screen.getCursorPosition();
         TextGraphics draw = screen.newTextGraphics();
-        // TODO: final list of commands: (c)lose (s)ave (p)lay (r)estart (a)dd (d)elete (e)dit
-        draw.putString(position, "Press command: (c)lose (p)lay (r)estart (a)dd");
+        // TODO: final list of commands: (c)lose (s)ave (p)lay (r)estart (a)dd (i)nsert (d)elete (e)dit
+        draw.putString(position, "Press command: (c)lose (p)lay (r)estart (a)dd (i)nsert (d)elete (e)dit");
         draw.putString(position.withRelativeRow(1), "Title: " + activeRoutine.getName());
         advanceCursorBy(screen, 3);
 
