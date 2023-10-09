@@ -11,7 +11,7 @@ public class Routine implements SegmentList {
     private final List<Segment> segments;
     // has a flattened numbering system that includes all segments in order, including subsegments of repeat ones
 
-
+    // --------------------------------------------------------------------------------------------
     // Public methods
     // --------------------------------------------------------------------------------------------
 
@@ -24,8 +24,42 @@ public class Routine implements SegmentList {
         segments.add(segment);
     }
 
-    // requires that segment is in segments, if it was an only child of a RepeatSegment, remove the parent too
+    // requires that beforeSegment is in segments
+    public void insertSegmentBefore(Segment newSegment, Segment segmentBeforeInserted) {
+        // TODO
+    }
+
+    // requires that segment is in segments
+    // if it was an only child of a RepeatSegment, remove the parent too
     public void removeSegment(Segment segment) {
+        removeInSegmentList(segment, segments);
+    }
+
+    // requires that segment is in segmentList OR one of its children (somewhere)
+    // modifies that list directly, either main or sublist
+    // returns whether to CHECK if remove the parent too (if the child segment list is now empty)
+    private boolean removeInSegmentList(Segment segmentToRemove, List<Segment> segmentList) {
+        if (segmentList.remove(segmentToRemove)) {
+            return segmentList.isEmpty();
+        }
+
+        // Search rest of the children/sub-children for it
+        Segment parentToRemove = null;
+        for (Segment child : segmentList) {
+            if (child.getType().equals("repeat")) {
+                List<Segment> grandchildren = ((RepeatSegment) child).getSegments();
+                if (removeInSegmentList(segmentToRemove, grandchildren) && grandchildren.isEmpty()) {
+                    parentToRemove = child;
+                }
+            }
+        }
+
+        // If removed parent segment without any children, check if you need to remove one layer up too
+        return segmentList.remove(parentToRemove);
+    }
+
+    // requires that segmentToReplace is in segments
+    public void replaceSegment(Segment newSegment, Segment segmentToReplace) {
         // TODO
     }
 
@@ -56,6 +90,13 @@ public class Routine implements SegmentList {
         return exactCurrentSegment;
     }
 
+    // --------------------------------------------------------------------------------------------
+    // private methods
+    // --------------------------------------------------------------------------------------------
+
+
+
+    // --------------------------------------------------------------------------------------------
     // SegmentList methods
     // --------------------------------------------------------------------------------------------
 
@@ -75,10 +116,9 @@ public class Routine implements SegmentList {
     public List<Segment> getFlattenedSegments() {
         List<Segment> allSegments = new ArrayList<>();
         for (Segment segment : getSegments()) {
-            if (segment instanceof SegmentList) {
+            allSegments.add(segment);
+            if (segment.getType().equals("repeat")) {
                 allSegments.addAll(((SegmentList) segment).getFlattenedSegments());
-            } else {
-                allSegments.add(segment);
             }
         }
         return allSegments;

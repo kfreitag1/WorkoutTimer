@@ -8,7 +8,6 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-import com.googlecode.lanterna.terminal.Terminal;
 import model.*;
 
 import java.io.IOException;
@@ -18,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TerminalWorkoutTimerApp {
-    private static final int TICKS_PER_SECOND = 30;
+    private static final int ESTIMATED_TICKS_PER_SECOND = 30;
     private static final TextColor COLOUR_ERROR = new TextColor.RGB(237, 64, 78);
     private static final TextColor COLOUR_COMPLETE = new TextColor.RGB(143, 242, 107);
     private static final TextColor COLOUR_ACTIVE = new TextColor.RGB(50, 200, 235);
@@ -29,6 +28,7 @@ public class TerminalWorkoutTimerApp {
 
     private String applicationState; // One of: "main_menu", "routine", "running"
     private Routine activeRoutine; // null during the main_menu, set during routine
+    private boolean displaySegmentIndices = false;
 
     // NOT FOR USE BY ANY FUNCTION EXCEPT getCommandWithRenderDisplay, renderCommandPromptAndInput
     private String commandPrompt; // can have newline characters, null unless getting input from user
@@ -57,7 +57,7 @@ public class TerminalWorkoutTimerApp {
 
     // EFFECTS:
     private void applicationLoop() throws IOException, InterruptedException {
-        long estimatedMilliseconds = 1000L / TICKS_PER_SECOND;
+        long estimatedMilliseconds = 1000L / ESTIMATED_TICKS_PER_SECOND;
 
         long prevTime = 0;
         long diffTime = estimatedMilliseconds;
@@ -76,9 +76,7 @@ public class TerminalWorkoutTimerApp {
     private boolean tick(long milliseconds) throws IOException {
         boolean keepGoing = handleUserInput();
 
-        long prevTime = System.currentTimeMillis();
         if (applicationState.equals("running")) {
-            long currentTime = System.currentTimeMillis();
             activeRoutine.advance(milliseconds);
         }
         renderScreen();
@@ -131,7 +129,7 @@ public class TerminalWorkoutTimerApp {
         String name = getStringWithValidation(
                 "Routine name: ",
                 "Name cannot be empty",
-                "\\S+");
+                ".+"); // matches any non-empty string because trims
 
         return new Routine(name);
     }
@@ -144,7 +142,6 @@ public class TerminalWorkoutTimerApp {
 
         switch (stroke.getCharacter()) {
             case 'p': // play
-                // TODO: ensure isComplete = false before going to
                 if (!activeRoutine.getSegments().isEmpty()) {
                     applicationState = "running";
                 }
@@ -160,12 +157,15 @@ public class TerminalWorkoutTimerApp {
                 break;
             case 'd': // delete
                 // TODO
+                deleteSegment();
                 break;
             case 'e': // edit
                 // TODO
                 break;
             case 'c': // close
-                // TODO
+                // TODO : ask user to save before closing
+                activeRoutine = null;
+                applicationState = "main_menu";
                 break;
             case 's': // save
                 // TODO
@@ -178,7 +178,7 @@ public class TerminalWorkoutTimerApp {
 
     private Segment makeSegmentFromInput() throws IOException {
         String name = getStringWithValidation(
-                "Segment name: ", "Name cannot be empty", "\\S+");
+                "Segment name: ", "Name cannot be empty", ".+");
 
         String type = getStringWithValidation(
                 "Segment type: (t)imed, (r)epeat, (m)anual ",
@@ -189,9 +189,7 @@ public class TerminalWorkoutTimerApp {
                 long milliseconds = getTimeWithValidation();
                 return new TimeSegment(name, milliseconds);
             case "r":
-                int numRepeats = getIntegerWithValidation(
-                        "Number of repetitions (1-99): ",
-                        "Invalid input (not an integer between 1 and 99)", "^[1-9][0-9]?$");
+                int numRepeats = getIntegerWithValidation("Number of repetitions (1-99): ", 1, 99);
 
                 List<Segment> children = new ArrayList<>();
                 do { // adds at least one child
@@ -204,6 +202,19 @@ public class TerminalWorkoutTimerApp {
             default:
                 return new ManualSegment("INVALID"); // Will never reach here
         }
+    }
+
+    private void deleteSegment() throws IOException {
+        if (activeRoutine.getSegments().isEmpty()) {
+            return;
+        }
+        displaySegmentIndices = true;
+        List<Segment> flattenedSegments = activeRoutine.getFlattenedSegments();
+        int indexToDelete = getIntegerWithValidation(
+                "Choose index to delete: (" + 0 + " to " + (flattenedSegments.size() - 1) + "): ",
+                0, (flattenedSegments.size() - 1));
+        activeRoutine.removeSegment(flattenedSegments.get(indexToDelete));
+        displaySegmentIndices = false;
     }
 
     // handles input for the running application state
@@ -295,6 +306,24 @@ public class TerminalWorkoutTimerApp {
         }
         return Integer.parseInt(value);
     }
+
+    private int getIntegerWithValidation(String prompt, int min, int max) throws IOException {
+        String value;
+        String currentErrorMessage = "";
+        while (true) {
+            value = getCommandWithRenderDisplay(prompt, currentErrorMessage);
+            value = value.trim();
+            if (!value.matches("^\\d+$")) {
+                currentErrorMessage = "Value is not in the range from " + min + " to " + max;
+            } else if (Integer.parseInt(value) < min || Integer.parseInt(value) > max) {
+                currentErrorMessage = "Value is not in the range from " + min + " to " + max;
+            } else {
+                break;
+            }
+        }
+        return Integer.parseInt(value);
+    }
+
 
     // returns time in milliseconds, specific implementation
     private long getTimeWithValidation() throws IOException {
@@ -405,7 +434,8 @@ public class TerminalWorkoutTimerApp {
     // modifies cursor position to be after whatever this is
     private void renderMainMenu(Screen screen) {
         TextGraphics draw = screen.newTextGraphics();
-        draw.putString(screen.getCursorPosition(), "press command: (n)ew (l)oad (q)uit");
+        // TODO: final list of commands: (n)ew (l)oad (q)uit
+        draw.putString(screen.getCursorPosition(), "Press command: (n)ew (q)uit");
         advanceCursorOneRow(screen);
     }
 
@@ -415,7 +445,8 @@ public class TerminalWorkoutTimerApp {
     private void renderRoutine(Screen screen) {
         TerminalPosition position = screen.getCursorPosition();
         TextGraphics draw = screen.newTextGraphics();
-        draw.putString(position, "press command: (c)lose (s)ave (p)lay (r)estart (a)dd (d)elete (e)dit");
+        // TODO: final list of commands: (c)lose (s)ave (p)lay (r)estart (a)dd (d)elete (e)dit
+        draw.putString(position, "Press command: (c)lose (p)lay (r)estart (a)dd");
         draw.putString(position.withRelativeRow(1), "Title: " + activeRoutine.getName());
         advanceCursorBy(screen, 3);
 
@@ -434,49 +465,66 @@ public class TerminalWorkoutTimerApp {
 
     // modifies cursor position to be after whatever this is
     private void renderRoutineLayer(Screen screen, List<Segment> layerSegments, boolean isActive, int layer) {
-        Segment currentSegment = null;
+        Segment activeSegment = null;
         if (!activeRoutine.isComplete()) {
-            currentSegment = activeRoutine.getExactCurrentSegment();
+            activeSegment = activeRoutine.getExactCurrentSegment();
         }
 
-        for (int i = 0; i < layerSegments.size(); i++) {
-            Segment segment = layerSegments.get(i);
-            TextGraphics draw = screen.newTextGraphics();
-            TerminalPosition position = screen.getCursorPosition().withRelativeColumn(layer * 2);
-
+        for (Segment segment : layerSegments) {
             // Set color depending on completion state and if currently active
+            TextGraphics draw = screen.newTextGraphics();
             if (isActive && segment.isComplete()) {
                 draw.setForegroundColor(COLOUR_COMPLETE);
-            } else if (isActive && segment.equals(currentSegment)) {
+            } else if (isActive && segment.equals(activeSegment)) {
                 draw.setForegroundColor(COLOUR_ACTIVE);
             }
 
-            switch (segment.getType()) {
-                case "time":
-                    TimeSegment timeSegment = (TimeSegment) segment;
-                    draw.putString(position,
-                            "TIME " + timeSegment.getName() + " "
-                                    + timeSegment.getCurrentTime() + "/"
-                                    + timeSegment.getTotalTime());
-                    advanceCursorOneRow(screen);
-                    break;
-                case "manual":
-                    draw.putString(position, "MANUAL " + segment.getName()
-                            + (isActive && segment.equals(currentSegment) ? " Press enter to continue!" : ""));
-                    advanceCursorOneRow(screen);
-                    break;
-                case "repeat":
-                    RepeatSegment repeatSegment = (RepeatSegment) segment;
-                    draw.putString(position,
-                            "REPEAT " + repeatSegment.getName() + " "
-                                    + repeatSegment.getCurrentRepetition() + "/"
-                                    + repeatSegment.getTotalRepetitions());
-                    advanceCursorOneRow(screen);
+            // Build line to display segment, include:
+            // 1. line number (optional), 2. spacing for different layers, 3. segment name,
+            // 4. segment type specific data
+            String segmentDisplay = displaySegmentIndices
+                    ? activeRoutine.getFlattenedSegments().indexOf(segment) + "\t" : "";
+            segmentDisplay += "   ".repeat(layer) + segment.getName() + " ";
+            segmentDisplay += displayTextForSegment(segment, isActive, activeSegment);
+            draw.putString(screen.getCursorPosition(), segmentDisplay);
+            advanceCursorOneRow(screen);
 
-                    renderRoutineLayer(screen, repeatSegment.getSegments(), isActive, layer + 1);
+            // Iteratively go through all children in any RepeatSegments
+            if (segment.getType().equals("repeat")) {
+                renderRoutineLayer(screen, ((RepeatSegment) segment).getSegments(), isActive, layer + 1);
             }
         }
     }
+
+    private String displayTextForSegment(Segment segment, boolean isActive, Segment activeSegment) {
+        switch (segment.getType()) {
+            case "time":
+                TimeSegment timeSegment = (TimeSegment) segment;
+                return timeSegment.getCurrentTime() + "/" + timeSegment.getTotalTime();
+            case "manual":
+                return isActive && segment.equals(activeSegment) ? "Press enter to continue!" : "";
+            case "repeat":
+                RepeatSegment repeatSegment = (RepeatSegment) segment;
+                return repeatSegment.getCurrentRepetition() + "/" + repeatSegment.getTotalRepetitions();
+        }
+        return null; // Will never reach here
+    }
+
+    // handles input for the running application state
+    // modifies cursor position to be after whatever this is
+    private void renderRunning(Screen screen) {
+        TerminalPosition position = screen.getCursorPosition();
+        TextGraphics draw = screen.newTextGraphics();
+        draw.putString(position, "Press command: (p)ause");
+        draw.putString(position.withRelativeRow(1), "Title: " + activeRoutine.getName());
+        advanceCursorBy(screen, 3);
+
+        renderRoutineLayer(screen, activeRoutine.getSegments(), true);
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Private utility methods
+    // --------------------------------------------------------------------------------------------
 
     private void advanceCursorOneRow(Screen screen) {
         advanceCursorBy(screen, 1);
@@ -487,15 +535,4 @@ public class TerminalWorkoutTimerApp {
         screen.setCursorPosition(screen.getCursorPosition().withRelativeRow(count));
     }
 
-    // handles input for the running application state
-    // modifies cursor position to be after whatever this is
-    private void renderRunning(Screen screen) {
-        TerminalPosition position = screen.getCursorPosition();
-        TextGraphics draw = screen.newTextGraphics();
-        draw.putString(position, "press command: (p)ause");
-        draw.putString(position.withRelativeRow(1), "Title: " + activeRoutine.getName());
-        advanceCursorBy(screen, 3);
-
-        renderRoutineLayer(screen, activeRoutine.getSegments(), true);
-    }
 }

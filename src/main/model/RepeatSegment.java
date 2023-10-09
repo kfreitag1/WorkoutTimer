@@ -86,10 +86,9 @@ public class RepeatSegment implements Segment, SegmentList {
     public List<Segment> getFlattenedSegments() {
         List<Segment> allSegments = new ArrayList<>();
         for (Segment child : getSegments()) {
+            allSegments.add(child);
             if (child instanceof SegmentList) {
                 allSegments.addAll(((SegmentList) child).getFlattenedSegments());
-            } else {
-                allSegments.add(child);
             }
         }
         return allSegments;
