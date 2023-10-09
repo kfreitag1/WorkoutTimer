@@ -118,7 +118,7 @@ public class TerminalWorkoutTimerApp {
                     return false;
                 }
         }
-        return false; // Will never reach here
+        throw new IllegalStateException("newState was not one of the required values");
     }
 
     // --------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ public class TerminalWorkoutTimerApp {
             case "running":
                 return handleUserInputRunning(stroke);
         }
-        return false; // Will never reach here
+        throw new IllegalStateException("Application state was not one of the required values");
     }
 
     // MODIFIES: this
@@ -251,8 +251,9 @@ public class TerminalWorkoutTimerApp {
                 return new RepeatSegment(name, numRepeats, children);
             case "m":
                 return new ManualSegment(name);
+            default:
+                throw new IllegalStateException("String must have been one of either trm due to validation");
         }
-        return null; // Will never reach here
     }
 
     // MODIFIES: this
@@ -684,7 +685,7 @@ public class TerminalWorkoutTimerApp {
                 RepeatSegment repeatSegment = (RepeatSegment) segment;
                 return repeatSegment.getCurrentRepetition() + "/" + repeatSegment.getTotalRepetitions();
         }
-        return null; // Will never reach here
+        throw new IllegalStateException("Segment type was not one of the required values");
     }
 
     // --------------------------------------------------------------------------------------------

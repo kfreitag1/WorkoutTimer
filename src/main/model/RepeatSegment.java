@@ -163,6 +163,6 @@ public class RepeatSegment implements Segment, SegmentList {
                 return child;
             }
         }
-        return null; // Will never reach here
+        throw new IllegalStateException("All segments were complete, violates requires clause");
     }
 }

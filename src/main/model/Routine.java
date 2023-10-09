@@ -203,7 +203,7 @@ public class Routine implements SegmentList {
                 return segment;
             }
         }
-        return null; // Will never reach here
+        throw new IllegalStateException("All segments were complete, violates requires clause");
     }
 
     // MODIFIES: this
