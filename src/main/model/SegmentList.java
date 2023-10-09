@@ -2,19 +2,20 @@ package model;
 
 import java.util.List;
 
+// Classes which implement SegmentList represents objects that contain a list
+// of segments (instances of classes which implement Segment).
 public interface SegmentList {
-    public List<Segment> getSegments();
+    List<Segment> getSegments();
 
-    public List<Segment> getFlattenedSegments();
+    List<Segment> getFlattenedSegments();
 
-    // returns the currently active segment (can be another repetition group)
-    public Segment getCurrentSegment();
+    Segment getCurrentSegment();
 
-    public void reset();
+    void reset();
 
-    public boolean isComplete();
+    boolean isComplete();
 
-    public String getName();
+    String getName();
 
-    public void setName(String newName);
+    void setName(String newName);
 }

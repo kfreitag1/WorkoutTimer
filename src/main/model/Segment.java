@@ -1,18 +1,16 @@
 package model;
 
-// a timer segment that can be one of three states:
-// 1. runs for a certain time
-// 2. a list of timer segments to repeat x times, can have arbitrary number of repetition groups udner it
-// 3. requires manual activation
-
+// Classes which implement Segment represents one segment of a procedure in a
+// Routine instance (or other class which implements SegmentList).
+// I.e. Each segment of the procedure implements the following methods.
 public interface Segment {
-    public String getName();
+    String getName();
 
-    public String getType();
+    String getType();
 
-    public boolean isComplete();
+    boolean isComplete();
 
-    public void reset();
+    void reset();
 
-    public void setName(String newName);
+    void setName(String newName);
 }
