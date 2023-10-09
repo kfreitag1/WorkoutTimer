@@ -182,6 +182,9 @@ public class TerminalWorkoutTimerApp {
             case 'e': // edit
                 editSegment();
                 break;
+            case 'i': // insert
+                insertSegment();
+                break;
             case 'c': // close
                 // TODO : ask user to save before closing
                 changeApplicationState("main_menu");
@@ -231,15 +234,15 @@ public class TerminalWorkoutTimerApp {
         if (activeRoutine.getSegments().isEmpty()) {
             return;
         }
-        Segment segmentToRemove = getSegmentAtIndexFromInput("Enter index of segment to delete: ");
-        activeRoutine.removeSegment(segmentToRemove);
+        Segment segmentToDelete = getSegmentIndexAtInput("Enter index of segment to delete: ");
+        activeRoutine.removeSegment(segmentToDelete);
     }
 
     private void editSegment() throws IOException {
         if (activeRoutine.getSegments().isEmpty()) {
             return;
         }
-        Segment segmentToEdit = getSegmentAtIndexFromInput("Enter index of segment to edit: ");
+        Segment segmentToEdit = getSegmentIndexAtInput("Enter index of segment to edit: ");
         segmentToEdit.setName(getStringWithValidation(
                 "New segment name: ", "Name cannot be empty",
                 ".+", segmentToEdit.getName()));
@@ -256,20 +259,45 @@ public class TerminalWorkoutTimerApp {
         }
     }
 
+    private void insertSegment() throws IOException {
+        if (activeRoutine.getSegments().isEmpty()) {
+            return;
+        }
+        String beforeOrAfter = getStringWithValidation(
+                "Insert (b)efore or (a)fter: ",
+                "Invalid input, not one of 'a' or 'b'",
+                "[ab]");
+
+        Segment segmentToInsertAround = getSegmentIndexAtInput(
+                "Enter index to insert " + (beforeOrAfter.equals("a") ? "after" : "before") + ": ");
+
+        Segment newSegment = makeSegmentFromInput();
+
+        if (beforeOrAfter.equals("a")) {
+            activeRoutine.insertSegmentAfter(newSegment, segmentToInsertAround);
+        } else {
+            activeRoutine.insertSegmentBefore(newSegment, segmentToInsertAround);
+        }
+    }
+
+
     // requires getSegments() is not empty
-    private Segment getSegmentAtIndexFromInput(String prompt) throws IOException {
+    private Segment getSegmentIndexAtInput(String prompt) throws IOException {
         // Make the render function add in indices beside each index
         displaySegmentIndices = true;
 
         List<Segment> flattenedSegments = activeRoutine.getFlattenedSegments();
+        int startIndex = 0;
+        int endIndex = flattenedSegments.size() - 1;
+
         int segmentIndex = getIntegerWithValidation(
-                prompt + "(" + 0 + " to " + (flattenedSegments.size() - 1) + "): ",
-                0, (flattenedSegments.size() - 1));
+                prompt + "(" + startIndex + " to " + endIndex + "): ",
+                startIndex, endIndex);
 
         // Stop displaying the segment indices
         displaySegmentIndices = false;
 
-        return flattenedSegments.get(segmentIndex);
+        return activeRoutine.getFlattenedSegments().get(segmentIndex);
     }
 
     // handles input for the running application state
@@ -581,7 +609,9 @@ public class TerminalWorkoutTimerApp {
         switch (segment.getType()) {
             case "time":
                 TimeSegment timeSegment = (TimeSegment) segment;
-                return timeSegment.getCurrentTime() + "/" + timeSegment.getTotalTime();
+                String currentTimeString = millisecondsToPrettyTime(timeSegment.getCurrentTime(), true);
+                String totalTimeString = millisecondsToPrettyTime(timeSegment.getTotalTime(), false);
+                return currentTimeString + " / " + totalTimeString;
             case "manual":
                 return isActive && segment.equals(activeSegment) ? "Press enter to continue!" : "";
             case "repeat":
@@ -614,6 +644,26 @@ public class TerminalWorkoutTimerApp {
     // requires count > 0
     private void advanceCursorBy(Screen screen, int count) {
         screen.setCursorPosition(screen.getCursorPosition().withRelativeRow(count));
+    }
+
+    private String millisecondsToPrettyTime(long milliseconds) {
+        return millisecondsToPrettyTime(milliseconds, false);
+    }
+
+    private String millisecondsToPrettyTime(long milliseconds, boolean includeDecimalOutput) {
+        long minutes = (milliseconds / 1000) / 60;
+        long seconds = (milliseconds / 1000) % 60;
+        long deciseconds = (milliseconds / 100) % 10;
+
+        String output = "";
+        if (minutes > 0) {
+            output += minutes + ":";
+            output += String.format("%02d", seconds);
+        } else {
+            output += Long.toString(seconds);
+        }
+        output += includeDecimalOutput ? "." + deciseconds : "";
+        return output;
     }
 
 }

@@ -24,14 +24,32 @@ public class Routine implements SegmentList {
         segments.add(segment);
     }
 
-    // requires that beforeSegment is in segments
-    public void insertSegmentBefore(Segment newSegment, Segment segmentBeforeInserted) {
-        // TODO
+    public void insertSegmentBefore(Segment segment, Segment segmentToInsertBefore) {
+        insertInSegmentList(segment, segmentToInsertBefore, segments, false);
     }
 
-    // requires that afterSegment is in segments
-    public void insertSegmentAfter(Segment newSegment, Segment segmentAfterInserted) {
-        // TODO
+    // requires segmentToInsertAfter is in segments
+    public void insertSegmentAfter(Segment segment, Segment segmentToInsertAfter) {
+        insertInSegmentList(segment, segmentToInsertAfter, segments, true);
+    }
+
+    // requires that segment is in segmentList OR one of its children (somewhere)
+    // modifies that list directly, either main or sublist
+    private void insertInSegmentList(Segment segment, Segment segmentToInsertAfter,
+                                     List<Segment> segmentList, boolean insertAfter) {
+        if (segmentList.contains(segmentToInsertAfter)) {
+            int index = segmentList.indexOf(segmentToInsertAfter);
+            segmentList.add(index + (insertAfter ? 1 : 0), segment);
+            return;
+        }
+
+        // Search rest of children/sub-children for it
+        for (Segment child : segmentList) {
+            if (child.getType().equals("repeat")) {
+                insertInSegmentList(segment, segmentToInsertAfter,
+                        ((RepeatSegment) child).getSegments(), insertAfter);
+            }
+        }
     }
 
     // requires that segment is in segments
