@@ -679,7 +679,7 @@ public class TerminalWorkoutTimerApp {
                 String totalTimeString = millisecondsToPrettyTime(timeSegment.getTotalTime(), false);
                 return currentTimeString + " / " + totalTimeString;
             case "manual":
-                return isActive && segment.equals(activeSegment) ? "Press enter to continue!" : "";
+                return isActive && segment.equals(activeSegment) ? "Press space to continue!" : "";
             case "repeat":
                 RepeatSegment repeatSegment = (RepeatSegment) segment;
                 return repeatSegment.getCurrentRepetition() + "/" + repeatSegment.getTotalRepetitions();
