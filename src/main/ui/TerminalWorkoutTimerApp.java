@@ -102,7 +102,7 @@ public class TerminalWorkoutTimerApp {
             case "main_menu":
                 activeRoutine = null;
                 applicationState = "main_menu";
-                break;
+                return true;
             case "routine":
                 if (activeRoutine != null) {
                     applicationState = "routine";
