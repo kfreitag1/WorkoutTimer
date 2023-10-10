@@ -31,11 +31,13 @@ example:*
 
 ## User stories
 
-- As a user, I want to be able to create a new timer routine with an 
-arbitrary number of timed, untimed, or repeated segments.
-- As a user, I want to be able to view all my saved timer routines.
-- As a user, I want to be able to modify the segments within an opened timer routine.
-- As a user, I want to be able to save and load timer routines.
-- As a user, I want to be able to play, pause, and restart the currently opened timer routine.
-- As a user, I want to be able to select a segment within a timer routine and modify its parameters (i.e. 
-  time or untimed, label, countdown alarm (e.g. beeps for 3 sec, 2 sec, 1 sec))
+- As a user, I want to be able to add a timer segment to the end of my routine (either 1. a timed segment, 2. a 
+  manually activated 
+  segment, or 3. a group of segments to repeat a certain number of times)
+- As a user, I want to be able to see all the timer segments in my routine
+- As a user, I want to be able to delete any arbitrary segment in my routine
+- As a user, I want to be able to insert a new segment before/after any other arbitrary segment in my routine
+- As a user, I want to be able to edit the parameters (e.g. name, time, repetitions, etc.) of any arbitrary segment 
+  in my routine
+- As a user, I want to be able to play, pause, and restart execution of my routine
+- As a user, I want to be able to see the current status of each timer segment when my routine is running
