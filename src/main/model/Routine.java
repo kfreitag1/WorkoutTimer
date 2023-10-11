@@ -148,13 +148,13 @@ public class Routine implements SegmentList {
 
         Segment currentSegment = getExactCurrentSegment();
 
-        if (currentSegment.getType().equals("time")) {
+        if (advanceManual && currentSegment.getType().equals("manual")) {
+            ((ManualSegment) currentSegment).setComplete();
+        } else if (currentSegment.getType().equals("time")) {
             long remainingTime = ((TimeSegment) currentSegment).addTime(milliseconds);
             if (remainingTime != 0) {
                 advance(remainingTime);
             }
-        } else if (advanceManual && currentSegment.getType().equals("manual")) {
-            ((ManualSegment) currentSegment).setComplete();
         }
     }
 

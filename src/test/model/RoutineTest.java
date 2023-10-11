@@ -153,7 +153,7 @@ public class RoutineTest {
         rn1.advance();
         assertTrue(rn1.isComplete());
 
-        // Advance time, wrong segment
+        // Advance time, wrong segment (expect manual, given time)
         rn2.advance(2000);
         assertEquals(m1, rn2.getCurrentSegment());
         assertFalse(rn2.isComplete());
@@ -165,6 +165,11 @@ public class RoutineTest {
         // Advance time, partially fill segment
         m2.setComplete(); // set up (m1 is already complete previously)
         rn3.advance(500);
+        assertEquals(t1, rn3.getExactCurrentSegment());
+        assertEquals(500, t1.getCurrentTime());
+
+        // Advance manual, wrong segment (expect time, given manual)
+        rn3.advance();
         assertEquals(t1, rn3.getExactCurrentSegment());
         assertEquals(500, t1.getCurrentTime());
 
