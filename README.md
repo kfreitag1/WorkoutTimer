@@ -41,3 +41,7 @@ example:*
   in my routine
 - As a user, I want to be able to play, pause, and restart execution of my routine
 - As a user, I want to be able to see the current status of each timer segment when my routine is running
+
+- As a user, I want to have the option to save the entire state of my routine to a file (also have the option to save 
+  when close routine)
+- As a user, I want to have the option to load my routine from the saved file and start off exactly where I was
