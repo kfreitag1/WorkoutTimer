@@ -9,7 +9,10 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import model.*;
+import persistance.RoutineReader;
+import persistance.RoutineWriter;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +21,14 @@ import java.util.regex.Pattern;
 
 // Represents a terminal-based app for WorkoutTimer
 public class TerminalWorkoutTimerApp {
+    private static final String JSON_STORE = "./data/routine.json";
     private static final int ESTIMATED_TICKS_PER_SECOND = 30;
     private static final TextColor COLOUR_ERROR = new TextColor.RGB(237, 64, 78);
     private static final TextColor COLOUR_COMPLETE = new TextColor.RGB(143, 242, 107);
     private static final TextColor COLOUR_ACTIVE = new TextColor.RGB(50, 200, 235);
+
+    private final RoutineWriter writer;
+    private final RoutineReader reader;
 
     private Screen screen;
     private TerminalSize terminalSize;
@@ -38,6 +45,12 @@ public class TerminalWorkoutTimerApp {
     // --------------------------------------------------------------------------------------------
     // Public methods
     // --------------------------------------------------------------------------------------------
+
+    // EFFECTS: Initializes reader/writer for application
+    public TerminalWorkoutTimerApp() {
+        writer = new RoutineWriter(JSON_STORE);
+        reader = new RoutineReader(JSON_STORE);
+    }
 
     // MODIFIES: this
     // EFFECTS: Starts the application by initializing all values and the application state
@@ -161,10 +174,15 @@ public class TerminalWorkoutTimerApp {
                 changeApplicationState("routine");
                 break;
             case 'l': // load
-                // TODO
+                try {
+                    activeRoutine = reader.read();
+                    changeApplicationState("routine");
+                } catch (IOException e) {
+                    // TODO
+                    System.out.println("ioexception in read");
+                }
                 break;
             case 'q': // quit
-                // TODO
                 return false;
         }
         return true;
@@ -214,14 +232,36 @@ public class TerminalWorkoutTimerApp {
                 insertSegment();
                 break;
             case 'c': // close
-                // TODO : ask user to save before closing
-                changeApplicationState("main_menu");
+                closeRoutine();
                 break;
             case 's': // save
-                // TODO
+                saveRoutine();
                 break;
         }
         return true;
+    }
+
+    // MODIFIES: this (only temporary getCommandWithRenderDisplay variables though)
+    // EFFECTS: Procedure to close routine and return to the main menu, asks user to save
+    private void closeRoutine() throws IOException {
+        boolean shouldSave = getBooleanWithValidation("Save routine? (y/n) ");
+        if (shouldSave) {
+            saveRoutine();
+        }
+        changeApplicationState("main_menu");
+    }
+
+    // MODIFIES: this (only temporary getCommandWithRenderDisplay variables though)
+    // EFFECTS: Procedure to save routine to the filesystem
+    private void saveRoutine() {
+        try {
+            writer.open();
+            writer.write(activeRoutine);
+            writer.close();
+        } catch (FileNotFoundException e) {
+            // TODO
+            System.out.println("file not found exception");
+        }
     }
 
     // MODIFIES: this (only temporary getCommandWithRenderDisplay variables though)
@@ -589,8 +629,7 @@ public class TerminalWorkoutTimerApp {
     //          the screen is after whatever is displayed by this function.
     private void renderMainMenu(Screen screen) {
         TextGraphics draw = screen.newTextGraphics();
-        // TODO: final list of commands: (n)ew (l)oad (q)uit
-        draw.putString(screen.getCursorPosition(), "Press command: (n)ew (q)uit");
+        draw.putString(screen.getCursorPosition(), "Press command: (n)ew (l)oad (q)uit");
         advanceCursorOneRow(screen);
     }
 
@@ -601,8 +640,7 @@ public class TerminalWorkoutTimerApp {
     private void renderRoutine(Screen screen) {
         TerminalPosition position = screen.getCursorPosition();
         TextGraphics draw = screen.newTextGraphics();
-        // TODO: final list of commands: (c)lose (s)ave (p)lay (r)estart (a)dd (i)nsert (d)elete (e)dit
-        draw.putString(position, "Press command: (c)lose (p)lay (r)estart (a)dd (i)nsert (d)elete (e)dit");
+        draw.putString(position, "Press command: (c)lose (s)ave (p)lay (r)estart (a)dd (i)nsert (d)elete (e)dit");
         draw.putString(position.withRelativeRow(1), "Title: " + activeRoutine.getName());
         advanceCursorBy(screen, 3);
 

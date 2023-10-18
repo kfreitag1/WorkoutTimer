@@ -1,5 +1,8 @@
 package model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,16 +18,30 @@ public class RepeatSegment implements Segment, SegmentList {
     // Will ALWAYS have at least one element
     private final List<Segment> children;
 
+    // --------------------------------------------------------------------------------------------
+    // Constructors
+    // --------------------------------------------------------------------------------------------
+
     // REQUIRES: numRepeats > 0, children.size() > 0
     // EFFECTS: Constructs a repeat segment with the given name, number of repetitions,
-    //          and list of children Segments
+    //          and list of children Segments (on first cycle)
     public RepeatSegment(String name, int numRepeats, List<Segment> children) {
+        this(name, numRepeats, children, 1);
+    }
+
+    // REQUIRES: numRepeats > 0, children.size() > 0, 1 <= currentCycle <= numRepeats
+    // EFFECTS: Constructs a partially completed repeat segment with the given name,
+    //          number of repetitions, list of children Segments, and current cycle number
+    public RepeatSegment(String name, int numRepeats, List<Segment> children, int currentCycle) {
         this.name = name;
         this.numRepeats = numRepeats;
         this.children = children;
-
-        currentCycle = 1;
+        this.currentCycle = currentCycle;
     }
+
+    // --------------------------------------------------------------------------------------------
+    // Public methods
+    // --------------------------------------------------------------------------------------------
 
     public int getTotalRepetitions() {
         return numRepeats;
@@ -164,5 +181,26 @@ public class RepeatSegment implements Segment, SegmentList {
             }
         }
         throw new IllegalStateException("All segments were complete, violates requires clause");
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Encodable methods
+    // --------------------------------------------------------------------------------------------
+
+    @Override
+    public JSONObject encoded() {
+        JSONObject object = new JSONObject();
+        object.put("type", getType());
+        object.put("name", name);
+        object.put("totalRepetitions", numRepeats);
+        object.put("currentRepetitions", currentCycle);
+
+        JSONArray children = new JSONArray();
+        for (Segment segment : this.children) {
+            children.put(segment.encoded());
+        }
+        object.put("children", children);
+
+        return object;
     }
 }

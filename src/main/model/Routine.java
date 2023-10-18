@@ -1,11 +1,15 @@
 package model;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import persistance.Encodable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 // Represents a single routine which contains a procedure (list) of segments which can be,
 // added, inserted, deleted, advanced (by time or manually).
-public class Routine implements SegmentList {
+public class Routine implements SegmentList, Encodable {
     private String name;
     private final List<Segment> segments;
 
@@ -234,5 +238,23 @@ public class Routine implements SegmentList {
     @Override
     public void setName(String newName) {
         this.name = newName;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Encodable methods
+    // --------------------------------------------------------------------------------------------
+
+    @Override
+    public JSONObject encoded() {
+        JSONObject object = new JSONObject();
+        object.put("name", name);
+
+        JSONArray segments = new JSONArray();
+        for (Segment segment : this.segments) {
+            segments.put(segment.encoded());
+        }
+        object.put("segments", segments);
+
+        return object;
     }
 }

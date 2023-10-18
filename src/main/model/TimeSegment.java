@@ -1,5 +1,7 @@
 package model;
 
+import org.json.JSONObject;
+
 import static java.lang.Math.min;
 
 // Represents a Segment that is completed after a certain amount of time
@@ -8,14 +10,29 @@ public class TimeSegment implements Segment {
     private long totalTime;
     private long currentTime;
 
+    // --------------------------------------------------------------------------------------------
+    // Constructors
+    // --------------------------------------------------------------------------------------------
+
     // REQUIRES: totalTime >= 0
-    // EFFECTS: Constructs a time segment with the given name, total time (in milliseconds),
+    // EFFECTS: Constructs a new time segment with the given name, total time (in milliseconds),
     //          and no current time elapsed.
     public TimeSegment(String name, long totalTime) {
+        this(name, totalTime, 0);
+    }
+
+    // REQUIRES: totalTime >= 0
+    // EFFECTS: Constructs a partially completed time segment with the given name, total time (in milliseconds),
+    //          and the given time elapsed.
+    public TimeSegment(String name, long totalTime, long currentTime) {
         this.name = name;
         this.totalTime = totalTime;
-        currentTime = 0;
+        this.currentTime = currentTime;
     }
+
+    // --------------------------------------------------------------------------------------------
+    // Public methods
+    // --------------------------------------------------------------------------------------------
 
     // REQUIRES: milliseconds >= 0
     // MODIFIES: this
@@ -76,5 +93,19 @@ public class TimeSegment implements Segment {
     @Override
     public void setName(String newName) {
         this.name = newName;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Encodable methods
+    // --------------------------------------------------------------------------------------------
+
+    @Override
+    public JSONObject encoded() {
+        JSONObject object = new JSONObject();
+        object.put("type", getType());
+        object.put("name", name);
+        object.put("totalTime", totalTime);
+        object.put("currentTime", currentTime);
+        return object;
     }
 }

@@ -1,15 +1,31 @@
 package model;
 
+import org.json.JSONObject;
+
 // Represents a Segment that is manually completed
 // i.e. the segment is only complete when it is manually set to be complete
 public class ManualSegment implements Segment {
     private String name;
-    private boolean finished = false;
+    private boolean finished;
 
-    // EFFECTS: Constructs a manual segment with the given name
+    // --------------------------------------------------------------------------------------------
+    // Constructors
+    // --------------------------------------------------------------------------------------------
+
+    // EFFECTS: Constructs a new manual segment with the given name (not completed)
     public ManualSegment(String name) {
-        this.name = name;
+        this(name, false);
     }
+
+    // EFFECTS: Constructs a potentially completed manual segment with the given name and completion state
+    public ManualSegment(String name, boolean finished) {
+        this.name = name;
+        this.finished = finished;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Public methods
+    // --------------------------------------------------------------------------------------------
 
     // MODIFIES: self
     // EFFECTS: Sets the segment to be complete
@@ -47,5 +63,18 @@ public class ManualSegment implements Segment {
     @Override
     public void setName(String newName) {
         name = newName;
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Encodable methods
+    // --------------------------------------------------------------------------------------------
+
+    @Override
+    public JSONObject encoded() {
+        JSONObject object = new JSONObject();
+        object.put("type", getType());
+        object.put("name", name);
+        object.put("finished", finished);
+        return object;
     }
 }
