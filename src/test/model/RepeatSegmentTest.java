@@ -9,7 +9,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RepeatSegmentTest {
-    private RepeatSegment r1, r2, r3, r31, r32;
+    private RepeatSegment r1, r2, r3, r31, r32, r4;
     private ManualSegment m1, m2;
     private TimeSegment t1, t2;
 
@@ -29,6 +29,9 @@ public class RepeatSegmentTest {
         r32 = new RepeatSegment("level 3", 1, Arrays.asList(m2));
         r31 = new RepeatSegment("level 2", 1, Arrays.asList(r32));
         r3 = new RepeatSegment("level 1", 2, Arrays.asList(r31));
+
+        // RepeatSegment with partially completed cycles
+        r4 = new RepeatSegment("partially complete", 3, Arrays.asList(m1), 2);
     }
 
     @Test
@@ -53,6 +56,13 @@ public class RepeatSegmentTest {
         assertEquals(2, r3.getTotalRepetitions());
         assertEquals(Arrays.asList(r31), r3.getSegments());
         assertFalse(r3.isComplete());
+
+        assertEquals("partially complete", r4.getName());
+        assertEquals("repeat", r4.getType());
+        assertEquals(2, r4.getCurrentRepetition());
+        assertEquals(3, r4.getTotalRepetitions());
+        assertEquals(Arrays.asList(m1), r4.getSegments());
+        assertFalse(r4.isComplete());
     }
 
     @Test
@@ -219,5 +229,14 @@ public class RepeatSegmentTest {
         ((TimeSegment) r2.getSegments().get(1)).addTime(2000); // second child complete
         ((TimeSegment) r2.getSegments().get(2)).addTime(200); // third child partially complete
         assertEquals(t2, r2.getCurrentSegment());
+
+        // IMPOSSIBLE CONDITION ALL CHILDREN COMPLETE (VIOLATES REQUIRES CLAUSE)
+        ((TimeSegment) r2.getSegments().get(2)).addTime(800);
+        try {
+            r2.getCurrentSegment();
+            fail("Didn't go into illegal state!");
+        } catch (IllegalStateException e) {
+            // should be here
+        }
     }
 }

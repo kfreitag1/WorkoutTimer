@@ -1,7 +1,6 @@
-package persistance;
+package persistence;
 
 import model.*;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;

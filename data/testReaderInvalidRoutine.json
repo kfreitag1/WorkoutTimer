@@ -1,0 +1,7 @@
+{
+    "name": "Invalid Name",
+    "segments": [{
+      "name": "Invalid",
+      "type": "something that I did not define"
+    }]
+}

@@ -1,6 +1,6 @@
 package model;
 
-import persistance.Encodable;
+import persistence.Encodable;
 
 // Classes which implement Segment represents one segment of a procedure in a
 // Routine instance (or other class which implements SegmentList).

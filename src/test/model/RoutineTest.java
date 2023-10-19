@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class RoutineTest {
@@ -82,6 +80,14 @@ public class RoutineTest {
         m3.setComplete();
         assertEquals(r1, rn3.getCurrentSegment());
         assertEquals(m2, rn3.getExactCurrentSegment()); // all the way at the bottom!
+
+        // IMPOSSIBLE CONDITION ALL CHILDREN COMPLETE / NO CHILDREN (VIOLATES REQUIRES CLAUSE)
+        try {
+            rn1.getCurrentSegment();
+            fail("Didn't go into illegal state!");
+        } catch (IllegalStateException e) {
+            // should be here
+        }
     }
 
     @Test

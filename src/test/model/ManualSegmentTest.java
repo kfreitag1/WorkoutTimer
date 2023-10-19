@@ -6,11 +6,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ManualSegmentTest {
-    private ManualSegment m1;
+    private ManualSegment m1, m2;
 
     @BeforeEach
     public void runBefore() {
         m1 = new ManualSegment("test name");
+        m2 = new ManualSegment("other name", true);
     }
 
     @Test
@@ -18,6 +19,13 @@ public class ManualSegmentTest {
         assertEquals("manual", m1.getType());
         assertEquals("test name", m1.getName());
         assertFalse(m1.isComplete());
+    }
+
+    @Test
+    public void testConstructionPartiallyComplete() {
+        assertEquals("manual", m2.getType());
+        assertEquals("other name", m2.getName());
+        assertTrue(m2.isComplete());
     }
 
     @Test

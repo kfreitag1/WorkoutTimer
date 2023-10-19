@@ -6,13 +6,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TimeSegmentTest {
-    private TimeSegment t1, t2, t3;
+    private TimeSegment t1, t2, t3, t4;
 
     @BeforeEach
     public void runBefore() {
         t1 = new TimeSegment("no time", 0);
         t2 = new TimeSegment("two seconds", 2000);
         t3 = new TimeSegment("three and half seconds", 3500);
+        t4 = new TimeSegment("partially complete", 100, 90);
     }
 
     @Test
@@ -28,6 +29,12 @@ public class TimeSegmentTest {
         assertEquals(2000, t2.getTotalTime());
         assertEquals(0, t2.getCurrentTime());
         assertFalse(t2.isComplete());
+
+        assertEquals("partially complete", t4.getName());
+        assertEquals("time", t4.getType());
+        assertEquals(100, t4.getTotalTime());
+        assertEquals(90, t4.getCurrentTime());
+        assertFalse(t4.isComplete());
     }
     
     @Test

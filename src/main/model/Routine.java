@@ -2,7 +2,7 @@ package model;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import persistance.Encodable;
+import persistence.Encodable;
 
 import java.util.ArrayList;
 import java.util.List;

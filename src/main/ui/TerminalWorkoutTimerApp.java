@@ -9,8 +9,8 @@ import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import model.*;
-import persistance.RoutineReader;
-import persistance.RoutineWriter;
+import persistence.RoutineReader;
+import persistence.RoutineWriter;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -179,7 +179,6 @@ public class TerminalWorkoutTimerApp {
                     changeApplicationState("routine");
                 } catch (IOException e) {
                     // TODO
-                    System.out.println("ioexception in read");
                 }
                 break;
             case 'q': // quit
@@ -260,7 +259,6 @@ public class TerminalWorkoutTimerApp {
             writer.close();
         } catch (FileNotFoundException e) {
             // TODO
-            System.out.println("file not found exception");
         }
     }
 

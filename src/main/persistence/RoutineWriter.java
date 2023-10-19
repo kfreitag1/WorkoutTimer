@@ -1,9 +1,8 @@
-package persistance;
+package persistence;
 
 import model.Routine;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
