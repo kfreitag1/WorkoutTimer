@@ -230,8 +230,13 @@ public class RepeatSegmentTest {
         ((TimeSegment) r2.getSegments().get(2)).addTime(200); // third child partially complete
         assertEquals(t2, r2.getCurrentSegment());
 
-        // IMPOSSIBLE CONDITION ALL CHILDREN COMPLETE (VIOLATES REQUIRES CLAUSE)
-        ((TimeSegment) r2.getSegments().get(2)).addTime(800);
+        // IMPOSSIBLE CONDITION ALL CHILDREN COMPLETE ON FINAL CYCLE (VIOLATES REQUIRES CLAUSE)
+        ((TimeSegment) r2.getSegments().get(2)).addTime(800);  // third child complete
+        r2.updateRepeatCycle();
+        ((ManualSegment) r2.getSegments().get(0)).setComplete();          // first child complete again
+        ((TimeSegment) r2.getSegments().get(1)).addTime(2000); // second child complete again
+        ((TimeSegment) r2.getSegments().get(2)).addTime(1000); // third child complete again
+
         try {
             r2.getCurrentSegment();
             fail("Didn't go into illegal state!");
