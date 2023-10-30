@@ -1,15 +1,20 @@
 package ui;
 
+import model.ManualSegment;
+import model.RepeatSegment;
 import model.Routine;
+import model.TimeSegment;
 import ui.screens.MainMenuScreen;
 import ui.screens.RoutineScreen;
 import ui.screens.Screen;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class WorkoutTimerApp extends JFrame {
-    private static final int MIN_WIDTH = 500;
+    private static final int MIN_WIDTH = 550;
     private static final int MIN_HEIGHT = 600;
 
     private Routine currentRoutine = null; // only set when on RoutineScreen
@@ -46,7 +51,22 @@ public class WorkoutTimerApp extends JFrame {
     // MODIFIES: this
     // EFFECTS: Convenience method for initRoutine to make new routine with given name
     public void initRoutine(String name) {
-        initRoutine(new Routine(name));
+        /////////////////////////////////////////
+        // TODO: REMOVE TEMPORARY TEST ROUTINE
+        ////////////////////////////////////////
+        Routine testRoutine = new Routine(name);
+        testRoutine.addSegment(new TimeSegment("Time1", 10000, 10000));
+        testRoutine.addSegment(new RepeatSegment("Repeat1", 2, new ArrayList<>(Arrays.asList(
+                new ManualSegment("Manual1", true),
+                new RepeatSegment("Repeat2", 4, new ArrayList<>(Arrays.asList(
+                        new ManualSegment("Manual2", true),
+                        new TimeSegment("Time2", 4000, 2000)
+                )), 2),
+                new TimeSegment("Time3", 5000)
+        ))));
+
+//        initRoutine(new Routine(name));
+        initRoutine(testRoutine);
     }
 
     public void closeRoutine() {

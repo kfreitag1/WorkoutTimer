@@ -3,6 +3,7 @@ package ui.screens;
 import model.Routine;
 import ui.WorkoutTimerApp;
 import ui.components.InfoDisplay;
+import ui.components.RoutineDisplay;
 import ui.components.RoutineToolbar;
 import ui.components.ToolbarButton;
 
@@ -26,10 +27,7 @@ public class RoutineScreen extends Screen {
         add(topArea, BorderLayout.NORTH);
 
         // Center area - routine content
-        JPanel contentArea = new JPanel();
-        JLabel contentText = new JLabel("center text");
-        contentArea.add(contentText, BorderLayout.CENTER);
-        add(contentArea, BorderLayout.CENTER);
+        add(new RoutineDisplay(routine), BorderLayout.CENTER);
 
         // Bottom text - info display
         InfoDisplay info = new InfoDisplay();
