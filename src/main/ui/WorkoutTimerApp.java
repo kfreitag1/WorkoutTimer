@@ -9,8 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class WorkoutTimerApp extends JFrame {
-    private static final int MIN_WIDTH = 400;
-    private static final int MIN_HEIGHT = 500;
+    private static final int MIN_WIDTH = 500;
+    private static final int MIN_HEIGHT = 600;
 
     private Routine currentRoutine = null; // only set when on RoutineScreen
 
@@ -25,6 +25,7 @@ public class WorkoutTimerApp extends JFrame {
         setMinimumSize(new Dimension(MIN_WIDTH, MIN_HEIGHT));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
+        setLocationRelativeTo(null);
 
         // Sets the first screen to the main menu so the user can make/load a routine
         setScreen(new MainMenuScreen(this));
