@@ -10,9 +10,17 @@ import ui.components.ToolbarButton;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class RoutineScreen extends Screen {
     private final Routine routine;
+    private String state; // one of "default" "running" "editing" ...
+    private Timer timer;
+
+    private RoutineToolbar routineToolbar;
+    private RoutineDisplay routineDisplay;
+    private InfoDisplay infoDisplay;
 
     public RoutineScreen(WorkoutTimerApp app, Routine routine) {
         super(app);
