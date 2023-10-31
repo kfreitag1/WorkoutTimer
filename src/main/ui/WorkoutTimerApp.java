@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class WorkoutTimerApp extends JFrame {
+    public static final int TICKS_PER_SECOND = 20;
     private static final int MIN_WIDTH = 550;
     private static final int MIN_HEIGHT = 600;
 
