@@ -50,7 +50,7 @@ public class RoutineToolbar extends JPanel {
     private void initEventHandlers() {
         playPauseButton.addActionListener(new PlayPauseButtonHandler(parentRoutineScreen));
         closeButton.addActionListener(e -> parentRoutineScreen.close());
-        restartButton.addActionListener(e -> parentRoutineScreen.reset());
+        restartButton.addActionListener(e -> parentRoutineScreen.resetRoutine());
         // TODO: other ones
     }
 

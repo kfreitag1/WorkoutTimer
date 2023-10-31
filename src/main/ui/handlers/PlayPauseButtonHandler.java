@@ -2,10 +2,11 @@ package ui.handlers;
 
 import ui.screens.RoutineScreen;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.Objects;
+import java.awt.event.ActionListener;
 
-public class PlayPauseButtonHandler extends ToolbarActionHandler {
+public class PlayPauseButtonHandler extends RoutineHandler implements ActionListener {
 
     public PlayPauseButtonHandler(RoutineScreen parentRoutineScreen) {
         super(parentRoutineScreen);

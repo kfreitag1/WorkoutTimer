@@ -6,21 +6,23 @@ import ui.WorkoutTimerApp;
 import ui.components.InfoDisplay;
 import ui.components.RoutineDisplay;
 import ui.components.RoutineToolbar;
-import ui.components.ToolbarButton;
+import ui.handlers.SpacebarHandler;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class RoutineScreen extends Screen {
     private final Routine routine;
     private String state; // one of "default" "running" "editing" ...
-    private Timer timer;
+    private final Timer timer;
 
     private RoutineToolbar routineToolbar;
     private RoutineDisplay routineDisplay;
     private InfoDisplay infoDisplay;
+
+    // --------------------------------------------------------------------------------------------
+    // Constructor + helpers
+    // --------------------------------------------------------------------------------------------
 
     public RoutineScreen(WorkoutTimerApp app, Routine routine) {
         super(app);
@@ -28,9 +30,15 @@ public class RoutineScreen extends Screen {
         this.state = "default";
 
         // Set up routine timer for precise interval
-        timer = new PreciceTimer(WorkoutTimerApp.TICKS_PER_SECOND, new TimerHandler());
+        timer = new PreciceTimer(WorkoutTimerApp.TICKS_PER_SECOND, milliseconds -> {
+            if (state.equals("running")) {
+                routine.advance(milliseconds);
+                routineDisplay.refresh();
+            }
+        });
 
         initLayout();
+        initHandlers();
     }
 
     private void initLayout() {
@@ -52,6 +60,17 @@ public class RoutineScreen extends Screen {
         infoDisplay = new InfoDisplay();
         add(infoDisplay, BorderLayout.SOUTH);
     }
+
+    private void initHandlers() {
+        // KeyBinding for spacebar
+        getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
+                KeyStroke.getKeyStroke(' '), "space");
+        getActionMap().put("space", new SpacebarHandler(this));
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // State methods
+    // --------------------------------------------------------------------------------------------
 
     //TODO: changes state, returns true if successful, updates display, handles timer
     public boolean changeState(String newState) {
@@ -86,23 +105,27 @@ public class RoutineScreen extends Screen {
         return state;
     }
 
-    public void close() {
-        app.closeRoutine();
-    }
+    // --------------------------------------------------------------------------------------------
+    // Public routine manipulation methods
+    // --------------------------------------------------------------------------------------------
 
-    public void reset() {
+    public void resetRoutine() {
         routine.reset();
         routineDisplay.refresh();
     }
 
-    private class TimerHandler implements PreciceTimer.IntervalListener {
-
-        @Override
-        public void tick(long milliseconds) {
-            if (state.equals("running")) {
-                routine.advance(milliseconds);
-                routineDisplay.refresh();
-            }
+    public void advanceRoutineManual() {
+        if (state.equals("running")) {
+            routine.advance();
+            routineDisplay.refresh();
         }
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // Public methods
+    // --------------------------------------------------------------------------------------------
+
+    public void close() {
+        app.closeRoutine();
     }
 }

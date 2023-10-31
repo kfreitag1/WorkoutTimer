@@ -4,10 +4,10 @@ import ui.screens.RoutineScreen;
 
 import java.awt.event.ActionListener;
 
-public abstract class ToolbarActionHandler implements ActionListener {
+public abstract class RoutineHandler {
     protected final RoutineScreen parentRoutineScreen;
 
-    public ToolbarActionHandler(RoutineScreen parentRoutineScreen) {
+    public RoutineHandler(RoutineScreen parentRoutineScreen) {
         this.parentRoutineScreen = parentRoutineScreen;
     }
 }
