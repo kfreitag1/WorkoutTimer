@@ -33,15 +33,16 @@ public class RoutineToolbar extends JPanel {
         closeButton = new ToolbarButton("Close");
 
         // Add buttons to toolbar in specified order with spacing
+        add(Box.createRigidArea(new Dimension(8, 8)));
         add(playPauseButton);
         add(restartButton);
         add(Box.createHorizontalGlue());
         add(addButton);
         add(deleteButton);
         add(editButton);
-        add(Box.createRigidArea(new Dimension(4, 1)));
         add(saveButton);
         add(closeButton);
+        add(Box.createRigidArea(new Dimension(8, 8)));
 
         initEventHandlers();
         updateToState("default");
