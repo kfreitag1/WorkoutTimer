@@ -33,7 +33,7 @@ public class RoutineScreen extends Screen {
         timer = new PreciceTimer(WorkoutTimerApp.TICKS_PER_SECOND, milliseconds -> {
             if (state.equals("running")) {
                 routine.advance(milliseconds);
-                routineDisplay.refresh();
+                routineDisplay.refresh(true);
             }
         });
 
@@ -53,7 +53,7 @@ public class RoutineScreen extends Screen {
         add(topArea, BorderLayout.NORTH);
 
         // Center area - routine content
-        routineDisplay = new RoutineDisplay(routine);
+        routineDisplay = new RoutineDisplay(routine, state.equals("running"));
         add(routineDisplay, BorderLayout.CENTER);
 
         // Bottom text - info display
@@ -99,6 +99,7 @@ public class RoutineScreen extends Screen {
     private void setState(String newState) {
         state = newState;
         routineToolbar.updateToState(newState);
+        routineDisplay.refresh(newState.equals("running"));
     }
 
     public String getState() {
@@ -111,13 +112,13 @@ public class RoutineScreen extends Screen {
 
     public void resetRoutine() {
         routine.reset();
-        routineDisplay.refresh();
+        routineDisplay.refresh(state.equals("running"));
     }
 
     public void advanceRoutineManual() {
         if (state.equals("running")) {
             routine.advance();
-            routineDisplay.refresh();
+            routineDisplay.refresh(true);
         }
     }
 
