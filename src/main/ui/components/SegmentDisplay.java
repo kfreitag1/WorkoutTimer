@@ -4,6 +4,7 @@ import model.RepeatSegment;
 import model.Routine;
 import model.Segment;
 import model.TimeSegment;
+import ui.handlers.SegmentMouseHandler;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -17,24 +18,38 @@ public class SegmentDisplay extends JComponent {
     private static final Color DEFAULT_BACKGROUND_COLOR = new Color(250, 250, 250);
     private static final Color CURRENT_BACKGROUND_COLOR = new Color(225, 239, 252);
     private static final Color COMPLETE_BACKGROUND_COLOR = new Color(226, 252, 225);
+    private static final Color HIGHLIGHT_OVERLAY_COLOR = new Color(29, 120, 240, 50);
 
     private final Routine routine;
     private final Segment segment;
     private String segmentState; // one of "default" "current" "complete"
-    private final boolean isRunning;
+    private final String routineState; // one of "default" "running" "editing" "deleting" "adding"
+    private final SegmentMouseHandler mouseHandler;
+
+    private Dimension mouseLocation = null; // only set when mouse is currently over this view
 
     private JLabel infoText = new JLabel();
 
     // REQUIRES: segment is in routine
     // EFFECTS: Constructs a view for a given segment in the given routine,
     //          modifies the display when the timer is running (isRunning is true)
-    SegmentDisplay(Routine routine, Segment segment, boolean isRunning) {
+    SegmentDisplay(Routine routine, Segment segment, String routineState, SegmentMouseHandler mouseHandler) {
         super();
         this.segment = segment;
         this.routine = routine;
-        this.isRunning = isRunning;
+        this.routineState = routineState;
+        this.mouseHandler = mouseHandler;
+        determineSegmentState();
 
-        determineState();
+        // Attach mouse handler on this segment
+        addMouseListener(mouseHandler);
+        addMouseMotionListener(mouseHandler);
+
+        // Set cursor to hand if in a selecting state
+        if (routineState.equals("editing") || routineState.equals("adding") || routineState.equals("deleting")) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
+
         initLayout();
     }
 
@@ -85,7 +100,7 @@ public class SegmentDisplay extends JComponent {
     // MODIFIES: this
     // EFFECTS: Sets the layout for the bottom section specific for a manual segment
     private void initManualSegment() {
-        if (isRunning && segmentState.equals("current")) {
+        if (routineState.equals("running") && segmentState.equals("current")) {
             infoText.setText("Press space to complete!");
         }
     }
@@ -102,7 +117,7 @@ public class SegmentDisplay extends JComponent {
 
         // Progress bar in continuous amount
         add(Box.createRigidArea(new Dimension(0, UNIT_SIZE / 2)));
-        add(new ProgressBar(getAccuratePercentage(currentTime, totalTime), isRunning));
+        add(new ProgressBar(getAccuratePercentage(currentTime, totalTime), routineState.equals("running")));
     }
 
     // MODIFIES: this
@@ -121,22 +136,25 @@ public class SegmentDisplay extends JComponent {
             percentage = getAccuratePercentage(currentCycle - 1, totalCycles);
         }
         add(Box.createRigidArea(new Dimension(0, UNIT_SIZE / 2)));
-        add(new ProgressBar(percentage, isRunning));
+        add(new ProgressBar(percentage, routineState.equals("running")));
 
         // Children segments
         JPanel childrenDisplay = new JPanel();
         childrenDisplay.setOpaque(false);
         childrenDisplay.setLayout(new BoxLayout(childrenDisplay, BoxLayout.PAGE_AXIS));
         for (Segment child : repeatSegment.getSegments()) {
-            childrenDisplay.add(new SegmentDisplay(routine, child, isRunning));
+            childrenDisplay.add(new SegmentDisplay(routine, child, routineState, mouseHandler));
         }
         add(childrenDisplay);
+
+        // Extra spacing on bottom to make it easier to click for after
+        add(Box.createRigidArea(new Dimension(0, (int) (UNIT_SIZE * 1.2))));
     }
 
     // MODIFIES: this
     // EFFECTS: Sets the current state depending on whether the segment for this view
     //          is complete or if its currently active
-    private void determineState() {
+    private void determineSegmentState() {
         if (segment.isComplete()) {
             segmentState = "complete";
         } else if (segment.equals(routine.getExactCurrentSegment())) {
@@ -175,7 +193,7 @@ public class SegmentDisplay extends JComponent {
         int boxHeight = getHeight() - UNIT_SIZE;
 
         Color backgroundColor = DEFAULT_BACKGROUND_COLOR;
-        if (isRunning) {
+        if (routineState.equals("running")) {
             switch (segmentState) {
                 case "complete":
                     backgroundColor = COMPLETE_BACKGROUND_COLOR;
@@ -193,5 +211,42 @@ public class SegmentDisplay extends JComponent {
         // Draw border around everything
         g.setColor(BORDER_COLOR);
         g.drawRoundRect(UNIT_SIZE, UNIT_SIZE / 2, boxWidth, boxHeight, UNIT_SIZE, UNIT_SIZE);
+    }
+
+    // EFFECTS: Overrides the superclass children painting method to draw an overlay
+    @Override
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+
+        // Paint overlay on hover if the mouse is over it and in a selecting routine state
+        if (mouseLocation != null) {
+            if (!(routineState.equals("adding") || routineState.equals("editing") || routineState.equals("deleting"))) {
+                return;
+            }
+
+            // Draw full overlay by default (editing, deleting)
+            int startingHeight = 0;
+            int endingHeight = getHeight();
+
+            // Overlay just the top or bottom half of the segment to choose a location for adding
+            if (routineState.equals("adding")) {
+                boolean mouseOverTopHalf = mouseLocation.height < (getHeight() / 2);
+
+                startingHeight = mouseOverTopHalf ? 0 : getHeight() / 2;
+                endingHeight = mouseOverTopHalf ? getHeight() / 2 : getHeight();
+            }
+
+            // Draw overlay
+            g.setColor(HIGHLIGHT_OVERLAY_COLOR);
+            g.fillRect(0, startingHeight, getWidth(), endingHeight);
+        }
+    }
+
+    public void setMouseLocation(Dimension mouseLocation) {
+        this.mouseLocation = mouseLocation;
+    }
+
+    public Segment getSegment() {
+        return segment;
     }
 }
