@@ -3,15 +3,16 @@ package ui.components;
 import javax.swing.*;
 import java.awt.*;
 
+// Represents a toolbar button
 public class ToolbarButton extends JButton {
 
-    // constructor for regular button
+    // EFFECTS: Constructs a regular button with specified label
     public ToolbarButton(String label) {
         super(label);
         init();
     }
 
-    // constructor for square button
+    // EFFECTS: Constructs a square button with specified label and width/height
     public ToolbarButton(String label, int size) {
         super(label);
         init();
@@ -22,6 +23,8 @@ public class ToolbarButton extends JButton {
         setPreferredSize(new Dimension(size, size));
     }
 
+    // MODIFIES: this
+    // EFFECTS: Common initializer for toolbar button construction
     private void init() {
         setAlignmentY(Component.BOTTOM_ALIGNMENT);
         setFocusable(false);

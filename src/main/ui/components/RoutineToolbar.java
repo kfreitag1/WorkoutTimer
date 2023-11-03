@@ -6,7 +6,10 @@ import ui.screens.RoutineScreen;
 import javax.swing.*;
 import java.awt.*;
 
+// Represents a toolbar for a RoutineScreen, displayed above the routine
 public class RoutineToolbar extends JPanel {
+    private static final int UNIT_SIZE = 8;
+
     private final ToolbarButton playPauseButton;
     private final ToolbarButton restartButton;
     private final ToolbarButton addButton;
@@ -17,13 +20,13 @@ public class RoutineToolbar extends JPanel {
 
     private final RoutineScreen parentRoutineScreen;
 
+    // EFFECTS: Constructs a new routine toolbar and initializes the appearance
+    //          and functionality of all buttons
     public RoutineToolbar(RoutineScreen parentRoutineScreen) {
         super();
         this.parentRoutineScreen = parentRoutineScreen;
-        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
-        setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        //TODO Initialize all buttons with handlers
+        // Create all buttons
         playPauseButton = new ToolbarButton("▶", 50); // PLAY, PAUSE: ⏸
         restartButton = new ToolbarButton("⏮", 50); // RESTART
         addButton = new ToolbarButton("Add");
@@ -32,8 +35,19 @@ public class RoutineToolbar extends JPanel {
         saveButton = new ToolbarButton("Save");
         closeButton = new ToolbarButton("Close");
 
+        initLayout();
+        initEventHandlers();
+        updateToState("default");
+    }
+
+    // MODIFIES: this
+    // EFFECTS: Lays out the components in the routine toolbar
+    private void initLayout() {
+        setLayout(new BoxLayout(this, BoxLayout.LINE_AXIS));
+        setAlignmentX(Component.LEFT_ALIGNMENT);
+
         // Add buttons to toolbar in specified order with spacing
-        add(Box.createRigidArea(new Dimension(8, 8)));
+        add(Box.createRigidArea(new Dimension(UNIT_SIZE, 0)));
         add(playPauseButton);
         add(restartButton);
         add(Box.createHorizontalGlue());
@@ -42,20 +56,25 @@ public class RoutineToolbar extends JPanel {
         add(editButton);
         add(saveButton);
         add(closeButton);
-        add(Box.createRigidArea(new Dimension(8, 8)));
-
-        initEventHandlers();
-        updateToState("default");
+        add(Box.createRigidArea(new Dimension(UNIT_SIZE, 0)));
     }
 
+    // MODIFIES: this
+    // EFFECTS: Adds "on click" event handlers or actions to all the buttons
     private void initEventHandlers() {
         playPauseButton.addActionListener(new PlayPauseButtonHandler(parentRoutineScreen));
         closeButton.addActionListener(e -> parentRoutineScreen.close());
         restartButton.addActionListener(e -> parentRoutineScreen.resetRoutine());
-        // TODO: other ones
+        addButton.addActionListener(e -> parentRoutineScreen.changeState("adding"));
+        deleteButton.addActionListener(e -> parentRoutineScreen.changeState("deleting"));
+        editButton.addActionListener(e -> parentRoutineScreen.changeState("editing"));
+        // TODO: Save button
     }
 
-    // state is one of "default" "running" "editing"
+    // REQUIRES: state is one of "default" "running" "editing" "deleting" "adding"
+    // MODIFIES: this
+    // EFFECTS: Modifies the appearance / interactivity of all the toolbar buttons
+    //          based on the state of the RoutineScreen
     public void updateToState(String state) {
         switch (state) {
             case "default":
@@ -65,11 +84,17 @@ public class RoutineToolbar extends JPanel {
                 updateToRunningState();
                 break;
             case "editing":
-                updateToEditingState();
+            case "deleting":
+            case "adding":
+                updateToChoosingState();
                 break;
+            default:
+                throw new IllegalStateException("RoutineToolbar state is invalid");
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: Updates the buttons to a default state (all enabled, play button)
     private void updateToDefaultState() {
         playPauseButton.setText("▶");
         playPauseButton.setEnabled(true);
@@ -81,6 +106,9 @@ public class RoutineToolbar extends JPanel {
         closeButton.setEnabled(true);
     }
 
+    // MODIFIES: this
+    // EFFECTS: Updates the buttons to a running state (only pause button
+    //          and restart button enabled)
     private void updateToRunningState() {
         playPauseButton.setText("⏸");
         playPauseButton.setEnabled(true);
@@ -92,7 +120,9 @@ public class RoutineToolbar extends JPanel {
         closeButton.setEnabled(false);
     }
 
-    private void updateToEditingState() {
+    // MODIFIES: this
+    // EFFECTS: Updates the buttons to a choosing state (all disabled)
+    private void updateToChoosingState() {
         playPauseButton.setEnabled(false);
         restartButton.setEnabled(false);
         addButton.setEnabled(false);
