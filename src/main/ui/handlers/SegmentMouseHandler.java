@@ -1,6 +1,6 @@
 package ui.handlers;
 
-import ui.components.SegmentDisplay;
+import ui.components.routine.SegmentDisplay;
 import ui.screens.RoutineScreen;
 
 import java.awt.*;

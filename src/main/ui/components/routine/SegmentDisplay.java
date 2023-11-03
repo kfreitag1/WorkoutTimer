@@ -1,4 +1,4 @@
-package ui.components;
+package ui.components.routine;
 
 import model.RepeatSegment;
 import model.Routine;

@@ -1,4 +1,4 @@
-package ui.components;
+package ui.components.routine;
 
 import ui.handlers.PlayPauseButtonHandler;
 import ui.screens.RoutineScreen;
