@@ -6,8 +6,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class PlayPauseButtonHandler extends RoutineHandler implements ActionListener {
-
+public class PlayPauseButtonHandler extends RoutineHandler {
     public PlayPauseButtonHandler(RoutineScreen parentRoutineScreen) {
         super(parentRoutineScreen);
     }

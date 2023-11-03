@@ -5,12 +5,9 @@ import ui.screens.RoutineScreen;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class SpacebarHandler extends AbstractAction  {
-    private final RoutineScreen parentRoutineScreen;
-
+public class SpacebarHandler extends RoutineHandler  {
     public SpacebarHandler(RoutineScreen parentRoutineScreen) {
-        super();
-        this.parentRoutineScreen = parentRoutineScreen;
+        super(parentRoutineScreen);
     }
 
     @Override
