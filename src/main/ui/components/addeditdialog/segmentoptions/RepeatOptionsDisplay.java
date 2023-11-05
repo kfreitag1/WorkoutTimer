@@ -3,7 +3,7 @@ package ui.components.addeditdialog.segmentoptions;
 import model.RepeatSegment;
 import model.Segment;
 import ui.components.addeditdialog.Updatable;
-import ui.components.addeditdialog.ValidatedTextField;
+import ui.components.ValidatedTextField;
 import ui.screens.AddEditDialog;
 
 import javax.swing.*;

@@ -1,7 +1,7 @@
 package ui.components.addeditdialog;
 
 import model.Segment;
-import model.SegmentList;
+import ui.components.Validatable;
 import ui.components.addeditdialog.segmentoptions.ManualOptionsDisplay;
 import ui.components.addeditdialog.segmentoptions.RepeatOptionsDisplay;
 import ui.components.addeditdialog.segmentoptions.TimeOptionsDisplay;

@@ -1,4 +1,6 @@
-package ui.components.addeditdialog;
+package ui.components;
+
+import ui.components.addeditdialog.Updatable;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

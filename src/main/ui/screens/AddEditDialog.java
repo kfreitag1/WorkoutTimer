@@ -4,14 +4,14 @@ import model.ManualSegment;
 import model.RepeatSegment;
 import model.Segment;
 import model.TimeSegment;
+import ui.components.Validatable;
+import ui.components.ValidatedTextField;
 import ui.components.addeditdialog.*;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.List;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 // Represents a dialog box to construct a new segment, or edit a pre-existing one
 // Can be called from the main application, or recursively from another AddEditDialog box

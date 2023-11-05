@@ -2,7 +2,7 @@ package ui.components.addeditdialog.segmentoptions;
 
 import model.Segment;
 import ui.components.addeditdialog.Updatable;
-import ui.components.addeditdialog.Validatable;
+import ui.components.Validatable;
 
 import javax.swing.*;
 

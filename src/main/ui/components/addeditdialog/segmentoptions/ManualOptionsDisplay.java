@@ -2,11 +2,8 @@ package ui.components.addeditdialog.segmentoptions;
 
 import model.Segment;
 import ui.components.addeditdialog.Updatable;
-import ui.components.addeditdialog.Validatable;
-import ui.components.addeditdialog.ValidatedTextField;
 
 import javax.swing.*;
-import java.awt.*;
 
 // Represents an options panel for the construction/editing of a ManualSegment
 // (Note: empty for now, but good to have in case want to add anything in future)

@@ -2,7 +2,7 @@ package ui.components.addeditdialog.segmentoptions;
 
 import model.Segment;
 import ui.components.addeditdialog.Updatable;
-import ui.components.addeditdialog.ValidatedTextField;
+import ui.components.ValidatedTextField;
 
 import javax.swing.*;
 import java.awt.*;

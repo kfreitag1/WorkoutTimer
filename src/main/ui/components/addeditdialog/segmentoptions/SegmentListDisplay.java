@@ -4,10 +4,9 @@ import model.RepeatSegment;
 import model.Segment;
 import ui.components.ScrollableComponent;
 import ui.components.addeditdialog.Updatable;
-import ui.components.addeditdialog.Validatable;
+import ui.components.Validatable;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 import java.util.ArrayList;
 import java.util.List;
 
