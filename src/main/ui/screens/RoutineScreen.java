@@ -84,12 +84,22 @@ public class RoutineScreen extends Screen {
         // KeyBinding for spacebar
         KeyStroke spaceKey = KeyStroke.getKeyStroke(' ');
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(spaceKey, "space");
-        getActionMap().put("space", new SpacebarHandler(this));
+        getActionMap().put("space", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                advanceRoutineManual();
+            }
+        });
 
-        // KeyBinding for escape key
+        // When escape key is pressed, try to change to the default state
         KeyStroke escapeKey = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(escapeKey, "escape");
-        getActionMap().put("escape", new EscapeHandler(this));
+        getActionMap().put("escape", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                changeState("default");
+            }
+        });
     }
 
     // --------------------------------------------------------------------------------------------
