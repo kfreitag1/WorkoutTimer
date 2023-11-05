@@ -1,0 +1,61 @@
+{
+    "name": "General Routine",
+    "segments": [
+        {
+            "currentTime": 0,
+            "totalTime": 3000,
+            "name": "Push ups",
+            "type": "time"
+        },
+        {
+            "name": "10x Sit ups",
+            "finished": false,
+            "type": "manual"
+        },
+        {
+            "currentRepetitions": 1,
+            "children": [
+                {
+                    "currentTime": 0,
+                    "totalTime": 2000,
+                    "name": "Plank",
+                    "type": "time"
+                },
+                {
+                    "currentTime": 0,
+                    "totalTime": 1000,
+                    "name": "Rest",
+                    "type": "time"
+                },
+                {
+                    "currentRepetitions": 1,
+                    "children": [
+                        {
+                            "currentTime": 0,
+                            "totalTime": 2000,
+                            "name": "Jumping Jacks",
+                            "type": "time"
+                        },
+                        {
+                            "name": "Untimed Rest",
+                            "finished": false,
+                            "type": "manual"
+                        }
+                    ],
+                    "totalRepetitions": 2,
+                    "name": "Sub-circuit",
+                    "type": "repeat"
+                }
+            ],
+            "totalRepetitions": 3,
+            "name": "Circuit",
+            "type": "repeat"
+        },
+        {
+            "currentTime": 0,
+            "totalTime": 3000,
+            "name": "Cooldown",
+            "type": "time"
+        }
+    ]
+}
