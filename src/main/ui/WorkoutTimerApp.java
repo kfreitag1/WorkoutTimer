@@ -1,25 +1,18 @@
 package ui;
 
-import model.ManualSegment;
-import model.RepeatSegment;
 import model.Routine;
-import model.TimeSegment;
 import ui.screens.MainMenuScreen;
 import ui.screens.RoutineScreen;
 import ui.screens.Screen;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 // Represents a UI based application for Workout Timer
 public class WorkoutTimerApp extends JFrame {
-    public static final int TICKS_PER_SECOND = 20;
-    private static final int MIN_WIDTH = 550;
+    public static final int TICKS_PER_SECOND = 30;
+    private static final int MIN_WIDTH = 520;
     private static final int MIN_HEIGHT = 600;
-
-    private Routine currentRoutine = null; // only set when on RoutineScreen
 
     // --------------------------------------------------------------------------------------------
     // Constructor
@@ -46,34 +39,18 @@ public class WorkoutTimerApp extends JFrame {
     // EFFECTS: Sets the current routine to the given routine and changes the screen to
     //          the routine screen
     public void initRoutine(Routine routine) {
-        currentRoutine = routine;
         setScreen(new RoutineScreen(this, routine));
     }
 
     // MODIFIES: this
     // EFFECTS: Convenience method for initRoutine to make new routine with given name
     public void initRoutine(String name) {
-        /////////////////////////////////////////
-        // TODO: REMOVE TEMPORARY TEST ROUTINE
-        ////////////////////////////////////////
-        Routine testRoutine = new Routine(name);
-        testRoutine.addSegment(new TimeSegment("Time1", 10000, 10000));
-        testRoutine.addSegment(new RepeatSegment("Repeat1", 2, new ArrayList<>(Arrays.asList(
-                new ManualSegment("Manual1", true),
-                new RepeatSegment("Repeat2", 4, new ArrayList<>(Arrays.asList(
-                        new ManualSegment("Manual2", true),
-                        new TimeSegment("Time2", 4000, 2000)
-                )), 2),
-                new TimeSegment("Time3", 5000)
-        ))));
-
-//        initRoutine(new Routine(name));
-        initRoutine(testRoutine);
+        initRoutine(new Routine(name));
     }
 
+    // MODIFIES: this
+    // EFFECTS: Closes the currently opened routine and shows the main menu
     public void closeRoutine() {
-        //TODO: ask the user if they want to save
-        currentRoutine = null;
         setScreen(new MainMenuScreen(this));
     }
 
