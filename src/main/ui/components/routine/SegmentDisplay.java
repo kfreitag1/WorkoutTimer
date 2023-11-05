@@ -112,8 +112,8 @@ public class SegmentDisplay extends JComponent {
         long currentTime = timeSegment.getCurrentTime();
         long totalTime = timeSegment.getTotalTime();
 
-        // Set the time in MM:SS TODO
-        infoText.setText(timeSegment.getCurrentTime() + "/" + timeSegment.getTotalTime());
+        infoText.setText(millisecondsToPrettyTime(currentTime, true) + "/"
+                + millisecondsToPrettyTime(totalTime, false));
 
         // Progress bar in continuous amount
         add(Box.createRigidArea(new Dimension(0, UNIT_SIZE / 2)));
@@ -248,5 +248,26 @@ public class SegmentDisplay extends JComponent {
 
     public Segment getSegment() {
         return segment;
+    }
+
+    // REQUIRES: milliseconds >= 0
+    // EFFECTS: Returns a fancy string representation of the given time (in milliseconds). The string
+    //          representation will be of the form X:YY if there's at least one minute, Y if there is less
+    //          than 1 minute, and will have .Z after it if includeDecimalOutput is true (for X minutes,
+    //          Y seconds, Z deciseconds in the given time).
+    private String millisecondsToPrettyTime(long milliseconds, boolean includeDecimalOutput) {
+        long minutes = (milliseconds / 1000) / 60;
+        long seconds = (milliseconds / 1000) % 60;
+        long centiseconds = (milliseconds / 10) % 100;
+
+        String output = "";
+        if (minutes > 0) {
+            output += minutes + ":";
+            output += String.format("%02d", seconds);
+        } else {
+            output += Long.toString(seconds);
+        }
+        output += includeDecimalOutput ? String.format(".%02d", centiseconds) : "";
+        return output;
     }
 }
