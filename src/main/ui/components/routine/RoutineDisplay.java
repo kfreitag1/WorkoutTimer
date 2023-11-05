@@ -2,27 +2,24 @@ package ui.components.routine;
 
 import model.Routine;
 import model.Segment;
+import ui.components.ScrollableComponent;
 import ui.handlers.SegmentMouseHandler;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 
 // Represents a scrollable view that displays a Routine with a list of children Segments
-public class RoutineDisplay extends JScrollPane {
+public class RoutineDisplay extends ScrollableComponent {
     private final Routine routine;
     private final SegmentMouseHandler mouseHandler;
-    private final JPanel body;
 
     // EFFECTS: Constructs the routine display with the given routine, whether the routine
     //          is currently running or not, and a mouse handler to attach to the children segments
     public RoutineDisplay(Routine routine, String routineState, SegmentMouseHandler mouseHandler) {
-        super(new JPanel(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        super();
         this.routine = routine;
         this.mouseHandler = mouseHandler;
 
-        getVerticalScrollBar().setUnitIncrement(3);
-
-        body = (JPanel) getViewport().getView();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
 
         refresh(routineState);
