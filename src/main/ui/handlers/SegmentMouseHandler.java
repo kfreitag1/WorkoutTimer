@@ -4,7 +4,6 @@ import ui.components.routine.SegmentDisplay;
 import ui.screens.RoutineScreen;
 
 import java.awt.*;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -20,6 +19,10 @@ public class SegmentMouseHandler extends RoutineHandler implements MouseMotionLi
     // EFFECTS: Passes the segment click event to the RoutineScreen to handle
     @Override
     public void mousePressed(MouseEvent e) {
+        if (!(e.getComponent() instanceof SegmentDisplay)) {
+            return;
+        }
+
         SegmentDisplay segmentDisplay = (SegmentDisplay) e.getComponent();
         boolean clickedTopHalf = e.getY() < (segmentDisplay.getHeight() / 2);
 
@@ -43,6 +46,10 @@ public class SegmentMouseHandler extends RoutineHandler implements MouseMotionLi
     // MODIFIES: the clicked SegmentDisplay
     // EFFECTS: Convenience methods to add/remove the mouse location on the clicked SegmentDisplay
     private void setSegmentMouseLocation(MouseEvent e, boolean exited) {
+        if (!(e.getComponent() instanceof SegmentDisplay)) {
+            return;
+        }
+
         SegmentDisplay segmentDisplay = (SegmentDisplay) e.getComponent();
         segmentDisplay.setMouseLocation(exited ? null : new Dimension(e.getX(), e.getY()));
         segmentDisplay.repaint();
