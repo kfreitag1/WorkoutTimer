@@ -31,12 +31,11 @@ example:*
 
 ## User stories
 
-- As a user, I want to be able to add a timer segment to the end of my routine (either 1. a timed segment, 2. a 
-  manually activated 
-  segment, or 3. a group of segments to repeat a certain number of times)
+- As a user, I want to be able to add multiple timer segments (either 1. a timed segment, 2. a
+  manually activated segment, or 3. a group of segments to repeat a certain number of times) to any arbitrary 
+  location in my routine
 - As a user, I want to be able to see all the timer segments in my routine
 - As a user, I want to be able to delete any arbitrary segment in my routine
-- As a user, I want to be able to insert a new segment before/after any other arbitrary segment in my routine
 - As a user, I want to be able to edit the parameters (e.g. name, time, repetitions, etc.) of any arbitrary segment 
   in my routine
 - As a user, I want to be able to play, pause, and restart execution of my routine
@@ -44,4 +43,20 @@ example:*
 
 - As a user, I want to have the option to save the entire state of my routine to a file (also have the option to save 
   when close routine)
-- As a user, I want to have the option to load my routine from the saved file and start off exactly where I was
+- As a user, I want to have the option to load any saved routine resume exactly where I was
+
+
+## Instructions for Grader
+
+1. Load a pre-existing routine by clicking on it in the main menu, or create a new empty routine by entering a 
+   routine name and then clicking on "Create new routine".
+2. You can generate the first required action related to adding "Segments" to a "Routine" by clicking on the "Add" 
+   button, entering information about the segment into the dialog popup, and then once completed, clicking on the 
+   location in which to insert the new segment (will place by default if the routine is empty).
+3. You can generate the second required action related to deleting/editing "Segments" on a "Routine" by clicking on 
+   the respective "Delete" or "Edit" buttons and following the onscreen instructions as with 2.
+4. You can locate my visual component by playing the routine (press the button with the play symbol). Time and 
+   repeat segments include a custom progress bar that changes size/colour depending on their completion states.
+5. You can save the application by pressing "Save", or by pressing "Close" and then pressing "Yes" on the dialog box 
+   asking to save.
+6. You can reload the application by pressing on the name of the application on the Main Menu screen.
