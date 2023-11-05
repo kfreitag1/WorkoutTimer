@@ -115,11 +115,11 @@ public class RoutineScreen extends Screen {
         state = newState;
         routineToolbar.updateToState(newState);
         refresh();
+        infoDisplay.clear();
 
         switch (newState) {
             case "default":
                 timer.stop();
-                infoDisplay.clear();
                 break;
             case "running":
                 timer.start();
@@ -144,13 +144,26 @@ public class RoutineScreen extends Screen {
     // Private routine manipulation methods
     // --------------------------------------------------------------------------------------------
 
-    private void beginEditSegment(Segment segment) {
-        // TODO
+    private void beginEditSegment(Segment segmentToEdit) {
+        AddEditDialog editDialog = new AddEditDialog(app, segmentToEdit);
+        // takes time ... then
+
+        changeState("default");
     }
 
     private void makeNewSegment() {
-        // TODO - new panel to make new segment and put it into constructedSegment
-        constructedSegment = new ManualSegment("CONSTRUCT"); // TODO remove
+        // reset the constructed segment
+        constructedSegment = null;
+
+        AddEditDialog addDialog = new AddEditDialog(app, newSegment -> {
+            constructedSegment = newSegment;
+        });
+
+        // user cancelled out of making the new segment
+        if (constructedSegment == null) {
+            changeState("default");
+            return;
+        }
 
         if (routine.getSegments().isEmpty()) {
             // If there are no segments, just insert it directly
@@ -161,26 +174,25 @@ public class RoutineScreen extends Screen {
         }
     }
 
-    // requires that
+    // requires that constructedSegment is not null
     // if segmentToInsertAround is null then insert at start of list
     private void addPremadeSegment(Segment segmentToInsertAround, boolean insertBefore) {
-        Segment segment = new ManualSegment("TEST"); // TODO remove
+        assert (constructedSegment != null);
 
         if (segmentToInsertAround == null) {
-            routine.addSegment(segment);
+            routine.addSegment(constructedSegment);
         } else if (insertBefore) {
-            routine.insertSegmentBefore(segment, segmentToInsertAround);
+            routine.insertSegmentBefore(constructedSegment, segmentToInsertAround);
         } else {
-            routine.insertSegmentAfter(segment, segmentToInsertAround);
+            routine.insertSegmentAfter(constructedSegment, segmentToInsertAround);
         }
 
-        setState("default");
-        refresh();
+        changeState("default");
     }
 
     private void deleteSegment(Segment segment) {
         routine.removeSegment(segment);
-        setState("default");
+        changeState("default");
     }
 
     // --------------------------------------------------------------------------------------------
