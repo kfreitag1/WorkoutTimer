@@ -8,7 +8,13 @@ import java.awt.*;
 
 // Represents a toolbar for a RoutineScreen, displayed above the routine
 public class RoutineToolbar extends JPanel {
+    private static final int SQUARE_BUTTON_SIZE = 50;
+    private static final int ICON_HEIGHT = 15;
     private static final int UNIT_SIZE = 8;
+
+    private static final Icon PLAY_ICON = new PlayPauseRewindIcon("play", ICON_HEIGHT);
+    private static final Icon PAUSE_ICON = new PlayPauseRewindIcon("pause", ICON_HEIGHT);
+    private static final Icon REWIND_ICON = new PlayPauseRewindIcon("rewind", ICON_HEIGHT);
 
     private final ToolbarButton playPauseButton;
     private final ToolbarButton restartButton;
@@ -27,8 +33,8 @@ public class RoutineToolbar extends JPanel {
         this.parentRoutineScreen = parentRoutineScreen;
 
         // Create all buttons
-        playPauseButton = new ToolbarButton("▶", 50); // PLAY, PAUSE: ⏸
-        restartButton = new ToolbarButton("⏮", 50); // RESTART
+        playPauseButton = new ToolbarButton(PLAY_ICON, SQUARE_BUTTON_SIZE);
+        restartButton = new ToolbarButton(REWIND_ICON, SQUARE_BUTTON_SIZE);
         addButton = new ToolbarButton("Add");
         deleteButton = new ToolbarButton("Delete");
         editButton = new ToolbarButton("Edit");
@@ -96,7 +102,7 @@ public class RoutineToolbar extends JPanel {
     // MODIFIES: this
     // EFFECTS: Updates the buttons to a default state (all enabled, play button)
     private void updateToDefaultState() {
-        playPauseButton.setText("▶");
+        playPauseButton.setIcon(PLAY_ICON);
         playPauseButton.setEnabled(true);
         restartButton.setEnabled(true);
         addButton.setEnabled(true);
@@ -110,7 +116,7 @@ public class RoutineToolbar extends JPanel {
     // EFFECTS: Updates the buttons to a running state (only pause button
     //          and restart button enabled)
     private void updateToRunningState() {
-        playPauseButton.setText("⏸");
+        playPauseButton.setIcon(PAUSE_ICON);
         playPauseButton.setEnabled(true);
         restartButton.setEnabled(true);
         addButton.setEnabled(false);

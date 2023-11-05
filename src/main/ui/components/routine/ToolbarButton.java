@@ -12,9 +12,9 @@ public class ToolbarButton extends JButton {
         init();
     }
 
-    // EFFECTS: Constructs a square button with specified label and width/height
-    public ToolbarButton(String label, int size) {
-        super(label);
+    // EFFECTS: Constructs a square button with specified image icon
+    public ToolbarButton(Icon icon, int size) {
+        super(icon);
         init();
 
         // Force dimensions on all three since it is very finicky
