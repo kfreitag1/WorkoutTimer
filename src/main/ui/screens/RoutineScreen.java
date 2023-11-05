@@ -3,6 +3,7 @@ package ui.screens;
 import model.ManualSegment;
 import model.Routine;
 import model.Segment;
+import persistence.RoutineWriter;
 import ui.PreciceTimer;
 import ui.WorkoutTimerApp;
 import ui.components.routine.InfoDisplay;
@@ -15,6 +16,9 @@ import ui.handlers.SpacebarHandler;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class RoutineScreen extends Screen {
     private final Routine routine;
@@ -236,6 +240,32 @@ public class RoutineScreen extends Screen {
     }
 
     public void close() {
+        int answer = JOptionPane.showConfirmDialog(
+                this, "Would you like to save?",
+                "Save routine",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE);
+
+        if (answer == JOptionPane.YES_OPTION) {
+            save();
+        }
+
         app.closeRoutine();
+    }
+
+    public void save() {
+        // TODO: make more robust, don't assume the filename is the same as routine name
+        Path pathname = Paths.get("data", "savedroutines", routine.getName() + ".json");
+        RoutineWriter routineWriter = new RoutineWriter(pathname.toString());
+
+        try {
+            routineWriter.open();
+            routineWriter.write(routine);
+            routineWriter.close();
+
+            infoDisplay.displaySuccess("Saved!");
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(null, "Error in saving file!");
+        }
     }
 }

@@ -63,12 +63,12 @@ public class RoutineToolbar extends JPanel {
     // EFFECTS: Adds "on click" event handlers or actions to all the buttons
     private void initEventHandlers() {
         playPauseButton.addActionListener(new PlayPauseButtonHandler(parentRoutineScreen));
-        closeButton.addActionListener(e -> parentRoutineScreen.close());
         restartButton.addActionListener(e -> parentRoutineScreen.resetRoutine());
         addButton.addActionListener(e -> parentRoutineScreen.changeState("adding"));
         deleteButton.addActionListener(e -> parentRoutineScreen.changeState("deleting"));
         editButton.addActionListener(e -> parentRoutineScreen.changeState("editing"));
-        // TODO: Save button
+        saveButton.addActionListener(e -> parentRoutineScreen.save());
+        closeButton.addActionListener(e -> parentRoutineScreen.close());
     }
 
     // REQUIRES: state is one of "default" "running" "editing" "deleting" "adding"
