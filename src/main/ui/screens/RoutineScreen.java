@@ -1,6 +1,5 @@
 package ui.screens;
 
-import model.ManualSegment;
 import model.Routine;
 import model.Segment;
 import persistence.RoutineWriter;
@@ -9,21 +8,23 @@ import ui.WorkoutTimerApp;
 import ui.components.routine.InfoDisplay;
 import ui.components.routine.RoutineDisplay;
 import ui.components.routine.RoutineToolbar;
-import ui.handlers.EscapeHandler;
 import ui.handlers.SegmentMouseHandler;
-import ui.handlers.SpacebarHandler;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+// Represents the routine screen of the Workout Timer application.
+// Centered around one Routine object which contains all the information to be shown.
 public class RoutineScreen extends Screen {
     private final Routine routine;
-    private String state; // one of "default" "running" "editing" "adding" "deleting" ...
     private final Timer timer;
+
+    private String state; // one of "default" "running" "editing" "adding" "deleting" ...
 
     private RoutineToolbar routineToolbar;
     private RoutineDisplay routineDisplay;
@@ -36,6 +37,8 @@ public class RoutineScreen extends Screen {
     // Constructor + helpers
     // --------------------------------------------------------------------------------------------
 
+    // EFFECTS: Constructs a new routine screen on the given app,
+    //          with the given Routine object
     public RoutineScreen(WorkoutTimerApp app, Routine routine) {
         super(app);
         this.routine = routine;
@@ -57,17 +60,27 @@ public class RoutineScreen extends Screen {
         });
 
         initLayout();
-        initHandlers();
+        initKeyBindings();
     }
 
+    // MODIFIES: this
+    // EFFECTS: Lays out all the elements on the screen
     private void initLayout() {
+
         // Top area - routine name and toolbar
         JPanel topArea = new JPanel();
         topArea.setLayout(new BoxLayout(topArea, BoxLayout.PAGE_AXIS));
+
+        // Wrap title in a container to make it horizontally centered
         JLabel routineTitle = new JLabel(routine.getName());
-        routineTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        routineTitle.setFont(new Font("Sans-Serif", Font.BOLD, 20));
+        JPanel titleContainer = new JPanel();
+        titleContainer.add(routineTitle);
+        titleContainer.setAlignmentX(Component.LEFT_ALIGNMENT);
+
         routineToolbar = new RoutineToolbar(this);
-        topArea.add(routineTitle);
+
+        topArea.add(titleContainer);
         topArea.add(routineToolbar);
         add(topArea, BorderLayout.NORTH);
 
@@ -80,8 +93,11 @@ public class RoutineScreen extends Screen {
         add(infoDisplay, BorderLayout.SOUTH);
     }
 
-    private void initHandlers() {
-        // KeyBinding for spacebar
+    // MODIFIES: this
+    // EFFECTS: Attaches any keybindings to the screen, i.e. functions that are called
+    //          whenever a certain key is pressed.
+    private void initKeyBindings() {
+        // When spacebar is pressed, try to advance any manual segments
         KeyStroke spaceKey = KeyStroke.getKeyStroke(' ');
         getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(spaceKey, "space");
         getActionMap().put("space", new AbstractAction() {
@@ -106,10 +122,10 @@ public class RoutineScreen extends Screen {
     // State methods
     // --------------------------------------------------------------------------------------------
 
-    //TODO: changes state if valid
+    // MODIFIES: this
+    // EFFECTS: Changes the state if it is a valid transition based on the current state,
+    //          returns true if the change to the new state was successful.
     public boolean changeState(String newState) {
-
-        // Return false if the state to change to is invalid from the current state
         switch (newState) {
             case "default": // Can always enter default state
                 break;
@@ -130,8 +146,12 @@ public class RoutineScreen extends Screen {
         return true;
     }
 
-    // newState is one of "default" "running" "editing" "deleting" "adding"
-    // and is validated to be okay to change to
+    // REQUIRES: newState is one of "default" "running" "editing" "deleting" "adding"
+    //           and is validated to be okay to change to.
+    // MODIFIES: this
+    // EFFECTS: Internal function to set the state to the new state and perform any
+    //          necessary updates to layouts or other objects. Notably, starts and stops
+    //          the timer used to increment time in the routine when running.
     private void setState(String newState) {
         state = newState;
         routineToolbar.updateToState(newState);
@@ -165,29 +185,32 @@ public class RoutineScreen extends Screen {
     // Private routine manipulation methods
     // --------------------------------------------------------------------------------------------
 
+    // MODIFIES: this
+    // EFFECTS: Starts the editing dialog for a certain segment in the routine
     private void beginEditSegment(Segment segmentToEdit) {
-        AddEditDialog editDialog = new AddEditDialog(app, segmentToEdit);
-        // takes time ... then
-
+        new AddEditDialog(app, segmentToEdit);
         changeState("default");
     }
 
+    // MODIFIES: this
+    // EFFECTS: Starts the adding dialog to make a new segment, then either adds it to
+    //          the routine (if routine is empty), otherwise waits for the user to click
+    //          a location to add the segment.
     private void makeNewSegment() {
-        // reset the constructed segment
+        // Reset the global storage for the constructed segment
         constructedSegment = null;
 
-        AddEditDialog addDialog = new AddEditDialog(app, newSegment -> {
-            constructedSegment = newSegment;
-        });
+        // Present add dialog and set the resulting segment to the constructed segment object
+        new AddEditDialog(app, newSegment -> constructedSegment = newSegment);
 
-        // user cancelled out of making the new segment
+        // User cancelled out of making the new segment
         if (constructedSegment == null) {
             changeState("default");
             return;
         }
 
         if (routine.getSegments().isEmpty()) {
-            // If there are no segments, just insert it directly
+            // If there are no segments, just insert it directly into the routine
             addPremadeSegment(null, false);
         } else {
             // Otherwise wait for the user to choose a location
@@ -195,8 +218,11 @@ public class RoutineScreen extends Screen {
         }
     }
 
-    // requires that constructedSegment is not null
-    // if segmentToInsertAround is null then insert at start of list
+    // REQUIRES: this.constructedSegment is not null, segmentToInsertAround is in routine
+    // MODIFIES: this
+    // EFFECTS: Adds the segment constructed by the user to the routine in a relative
+    //          position around another segment in the routine. If segmentToInsertAround is null
+    //          then just inserts the new segment into the first position on the routine.
     private void addPremadeSegment(Segment segmentToInsertAround, boolean insertBefore) {
         assert (constructedSegment != null);
 
@@ -211,6 +237,9 @@ public class RoutineScreen extends Screen {
         changeState("default");
     }
 
+    // REQUIRES: segment is in routine
+    // MODIFIES: this
+    // EFFECTS: Removes the segment from the routine
     private void deleteSegment(Segment segment) {
         routine.removeSegment(segment);
         changeState("default");
@@ -220,11 +249,15 @@ public class RoutineScreen extends Screen {
     // Public routine manipulation methods
     // --------------------------------------------------------------------------------------------
 
+    // MODIFIES: this
+    // EFFECTS: Resets the routine to have all segments incomplete
     public void resetRoutine() {
         routine.reset();
         refresh();
     }
 
+    // MODIFIES: this
+    // EFFECTS: Advances the routine if it is running and on a manual segment
     public void advanceRoutineManual() {
         if (state.equals("running")) {
             routine.advance();
@@ -236,9 +269,10 @@ public class RoutineScreen extends Screen {
     // Public methods
     // --------------------------------------------------------------------------------------------
 
+    // MODIFIES: this
+    // EFFECTS: Performs the desired action when the user selects a segment or segment
+    //          location, from a choosing state (i.e. deleting, editing, adding).
     public void clickedSegmentLocation(Segment segment, boolean topHalf) {
-        System.out.println(segment.getName() + " " + topHalf);
-
         switch (state) {
             case "editing":
                 beginEditSegment(segment);
@@ -252,10 +286,15 @@ public class RoutineScreen extends Screen {
         }
     }
 
+    // MODIFIES: this
+    // EFFECTS: Refreshes the routine display to update any changes
     public void refresh() {
         routineDisplay.refresh(state);
     }
 
+    // MODIFIES: this
+    // EFFECTS: Closes the routine and returns to the main menu, first asking if
+    //          the user wants to save the routine.
     public void close() {
         int answer = JOptionPane.showConfirmDialog(
                 this, "Would you like to save?",
@@ -270,6 +309,8 @@ public class RoutineScreen extends Screen {
         app.closeRoutine();
     }
 
+    // MODIFIES: this
+    // EFFECTS: Saves the routine to the filesystem
     public void save() {
         // TODO: make more robust, don't assume the filename is the same as routine name
         Path pathname = Paths.get("data", "savedroutines", routine.getName() + ".json");

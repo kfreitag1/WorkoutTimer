@@ -43,7 +43,7 @@ public class RepeatOptionsDisplay extends OptionsDisplay {
 
         // Add child segment button
         // Only enabled when making new segment, not editing
-        JButton addSegmentButton = new JButton("Add Segment");
+        JButton addSegmentButton = new JButton("Add Sub-Segment");
         addSegmentButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         addSegmentButton.setEnabled(segmentToEdit == null);
         addSegmentButton.addActionListener(e -> {

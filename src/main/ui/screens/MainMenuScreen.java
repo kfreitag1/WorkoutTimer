@@ -7,7 +7,6 @@ import ui.components.mainmenu.SavedRoutinesList;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.io.IOException;
 
 // Represents the main menu screen of the Workout Timer application.
 // Allows the user to make a new routine or open a saved routine.

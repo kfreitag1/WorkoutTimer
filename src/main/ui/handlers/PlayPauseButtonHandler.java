@@ -2,22 +2,25 @@ package ui.handlers;
 
 import ui.screens.RoutineScreen;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
+// Represents a handler for the play/pause button
 public class PlayPauseButtonHandler extends RoutineHandler {
     public PlayPauseButtonHandler(RoutineScreen parentRoutineScreen) {
         super(parentRoutineScreen);
     }
 
+    // MODIFIES: parentRoutineScreen
+    // EFFECTS: Sets the state of the routine screen depending on if the user
+    //          clicked pause (currently in running state), or play (currently in
+    //          default state)
     @Override
     public void actionPerformed(ActionEvent e) {
         if (parentRoutineScreen.getState().equals("default")) {
-            // play
+            // Play
             parentRoutineScreen.changeState("running");
         } else if (parentRoutineScreen.getState().equals("running")) {
-            // pause
+            // Pause
             parentRoutineScreen.changeState("default");
         }
     }
