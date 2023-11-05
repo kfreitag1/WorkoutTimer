@@ -46,6 +46,13 @@ public class RoutineScreen extends Screen {
             if (state.equals("running")) {
                 routine.advance(milliseconds);
                 refresh();
+
+                // Check if complete
+                if (routine.isComplete()) {
+                    infoDisplay.displaySuccess("Routine complete!");
+                } else {
+                    infoDisplay.clear();
+                }
             }
         });
 
