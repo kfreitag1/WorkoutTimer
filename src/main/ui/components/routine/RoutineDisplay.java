@@ -30,12 +30,30 @@ public class RoutineDisplay extends ScrollableComponent {
     //          objects. Completely replaces all the children SegmentDisplay views on each refresh
     public void refresh(String routineState) {
         body.removeAll();
-        for (Segment segment : routine.getSegments()) {
-            SegmentDisplay segmentDisplay = new SegmentDisplay(routine, segment, routineState, mouseHandler);
-            body.add(segmentDisplay);
+        if (routine.getSegments().isEmpty()) {
+            addCenteredLabel("No segments yet!");
+        } else {
+            for (Segment segment : routine.getSegments()) {
+                SegmentDisplay segmentDisplay = new SegmentDisplay(routine, segment, routineState, mouseHandler);
+                body.add(segmentDisplay);
+            }
         }
         repaint();
         revalidate();
+    }
+
+    // EFFECTS: Adds a JLabel with the specified text to the center of the screen
+    private void addCenteredLabel(String text) {
+        JPanel horizontalBox = new JPanel();
+        horizontalBox.setLayout(new BoxLayout(horizontalBox, BoxLayout.LINE_AXIS));
+        horizontalBox.add(Box.createHorizontalGlue());
+        horizontalBox.add(new JLabel(text));
+        horizontalBox.add(Box.createHorizontalGlue());
+
+        body.add(Box.createVerticalGlue());
+        body.add(horizontalBox);
+        body.add(Box.createVerticalGlue());
+        body.add(Box.createVerticalGlue());
     }
 
     // EFFECTS: Overrides the superclass border to remove it
