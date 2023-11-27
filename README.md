@@ -60,3 +60,29 @@ example:*
 5. You can save the application by pressing "Save", or by pressing "Close" and then pressing "Yes" on the dialog box 
    asking to save.
 6. You can reload the application by pressing on the name of the application on the Main Menu screen.
+
+
+## Phase 4: Task 2
+
+Representative event log:
+- Mon Nov 27 13:26:29 PST 2023
+
+  Added a segment with name: Push-ups
+
+- Mon Nov 27 13:26:53 PST 2023
+
+  Inserted new segment with name: Pull-ups 10x, after segment: Push-ups
+
+- Mon Nov 27 13:26:59 PST 2023
+
+  Removed segment with name: Pull-ups 10x
+
+- Mon Nov 27 13:27:07 PST 2023
+
+  Inserted new segment with name: Plank, before segment: Push-ups
+
+- Mon Nov 27 13:27:13 PST 2023
+
+  Removed segment with name: Push-ups
+
+

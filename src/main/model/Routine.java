@@ -27,6 +27,7 @@ public class Routine implements SegmentList, Encodable {
     // EFFECTS: Adds the given segment to the end of segments
     public void addSegment(Segment segment) {
         segments.add(segment);
+        EventLog.getInstance().logEvent(new Event("Added a segment with name: " + segment.getName()));
     }
 
     // REQUIRES: segmentToInsertBefore is in segments (or one of its children/sub-children!)
@@ -35,6 +36,9 @@ public class Routine implements SegmentList, Encodable {
     //          specified segment.
     public void insertSegmentBefore(Segment segment, Segment segmentToInsertBefore) {
         insertInSegmentList(segment, segmentToInsertBefore, segments, false);
+        EventLog.getInstance().logEvent(new Event(
+                "Inserted new segment with name: " + segment.getName() + ", before segment: "
+                        + segmentToInsertBefore.getName()));
     }
 
     // REQUIRES: segmentToInsertAfter is in segments (or one of its children/sub-children!)
@@ -43,6 +47,9 @@ public class Routine implements SegmentList, Encodable {
     //          specified segment.
     public void insertSegmentAfter(Segment segment, Segment segmentToInsertAfter) {
         insertInSegmentList(segment, segmentToInsertAfter, segments, true);
+        EventLog.getInstance().logEvent(new Event(
+                "Inserted new segment with name: " + segment.getName() + ", after segment: "
+                        + segmentToInsertAfter.getName()));
     }
 
     // REQUIRES: segment in segments (or one of its children/sub-children!)
@@ -51,6 +58,7 @@ public class Routine implements SegmentList, Encodable {
     //          repeat segments that would have no children after performing this operation.
     public void removeSegment(Segment segment) {
         removeInSegmentList(segment, segments);
+        EventLog.getInstance().logEvent(new Event("Removed segment with name: " + segment.getName()));
     }
 
     // REQUIRES: milliseconds >= 0

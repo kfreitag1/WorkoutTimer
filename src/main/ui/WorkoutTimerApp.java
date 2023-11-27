@@ -1,5 +1,7 @@
 package ui;
 
+import model.EventLog;
+import model.Event;
 import model.Routine;
 import ui.screens.MainMenuScreen;
 import ui.screens.RoutineScreen;
@@ -7,9 +9,11 @@ import ui.screens.Screen;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 // Represents a UI based application for Workout Timer
-public class WorkoutTimerApp extends JFrame {
+public class WorkoutTimerApp extends JFrame implements WindowListener {
     public static final int TICKS_PER_SECOND = 30;
     private static final int MIN_WIDTH = 520;
     private static final int MIN_HEIGHT = 600;
@@ -29,6 +33,9 @@ public class WorkoutTimerApp extends JFrame {
 
         // Sets the first screen to the main menu so the user can make/load a routine
         setScreen(new MainMenuScreen(this));
+
+        // Set self as a window listener to listen for close events
+        addWindowListener(this);
     }
 
     // --------------------------------------------------------------------------------------------
@@ -64,5 +71,47 @@ public class WorkoutTimerApp extends JFrame {
         getContentPane().removeAll();
         getContentPane().add(newScreen);
         getContentPane().revalidate();
+    }
+
+    // --------------------------------------------------------------------------------------------
+    // WindowListener implementation
+    // --------------------------------------------------------------------------------------------
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        // Do nothing
+    }
+
+    // EFFECTS: Log all events to the console when the user quits the application
+    @Override
+    public void windowClosing(WindowEvent e) {
+        for (Event event : EventLog.getInstance()) {
+            System.out.println(event.toString() + "\n");
+        }
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+        // Do nothing
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+        // Do nothing
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+        // Do nothing
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+        // Do nothing
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+        // Do nothing
     }
 }
