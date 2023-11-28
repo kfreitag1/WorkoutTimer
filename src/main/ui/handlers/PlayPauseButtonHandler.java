@@ -1,6 +1,7 @@
 package ui.handlers;
 
 import ui.screens.RoutineScreen;
+import ui.screens.RoutineScreenState;
 
 import java.awt.event.ActionEvent;
 
@@ -16,12 +17,13 @@ public class PlayPauseButtonHandler extends RoutineHandler {
     //          default state)
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (parentRoutineScreen.getState().equals("default")) {
-            // Play
-            parentRoutineScreen.changeState("running");
-        } else if (parentRoutineScreen.getState().equals("running")) {
-            // Pause
-            parentRoutineScreen.changeState("default");
+        switch (parentRoutineScreen.getState()) {
+            case DEFAULT:
+                parentRoutineScreen.changeState(RoutineScreenState.RUNNING);
+                break;
+            case RUNNING:
+                parentRoutineScreen.changeState(RoutineScreenState.DEFAULT);
+                break;
         }
     }
 }

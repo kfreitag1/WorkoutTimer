@@ -21,10 +21,11 @@ import java.nio.file.Paths;
 // Represents the routine screen of the Workout Timer application.
 // Centered around one Routine object which contains all the information to be shown.
 public class RoutineScreen extends Screen {
+
     private final Routine routine;
     private final Timer timer;
 
-    private String state; // one of "default" "running" "editing" "adding" "deleting" ...
+    private RoutineScreenState state;
 
     private RoutineToolbar routineToolbar;
     private RoutineDisplay routineDisplay;
@@ -42,11 +43,11 @@ public class RoutineScreen extends Screen {
     public RoutineScreen(WorkoutTimerApp app, Routine routine) {
         super(app);
         this.routine = routine;
-        this.state = "default";
+        this.state = RoutineScreenState.DEFAULT;
 
         // Set up routine timer for precise interval
         timer = new PreciceTimer(WorkoutTimerApp.TICKS_PER_SECOND, milliseconds -> {
-            if (state.equals("running")) {
+            if (state == RoutineScreenState.RUNNING) {
                 routine.advance(milliseconds);
                 refresh();
 
@@ -113,7 +114,7 @@ public class RoutineScreen extends Screen {
         getActionMap().put("escape", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                changeState("default");
+                changeState(RoutineScreenState.DEFAULT);
             }
         });
     }
@@ -125,15 +126,15 @@ public class RoutineScreen extends Screen {
     // MODIFIES: this
     // EFFECTS: Changes the state if it is a valid transition based on the current state,
     //          returns true if the change to the new state was successful.
-    public boolean changeState(String newState) {
+    public boolean changeState(RoutineScreenState newState) {
         switch (newState) {
-            case "default": // Can always enter default state
+            case DEFAULT: // Can always enter default state
                 break;
-            case "running": // Can only go into the these states from the default state
-            case "deleting":
-            case "adding":
-            case "editing":
-                if (!state.equals("default")) {
+            case RUNNING: // Can only go into the these states from the default state
+            case DELETING:
+            case ADDING:
+            case EDITING:
+                if (state != RoutineScreenState.DEFAULT) {
                     return false;
                 }
                 break;
@@ -146,38 +147,37 @@ public class RoutineScreen extends Screen {
         return true;
     }
 
-    // REQUIRES: newState is one of "default" "running" "editing" "deleting" "adding"
-    //           and is validated to be okay to change to.
+    // REQUIRES: newState is validated to be okay to change to.
     // MODIFIES: this
     // EFFECTS: Internal function to set the state to the new state and perform any
     //          necessary updates to layouts or other objects. Notably, starts and stops
     //          the timer used to increment time in the routine when running.
-    private void setState(String newState) {
+    private void setState(RoutineScreenState newState) {
         state = newState;
         routineToolbar.updateToState(newState);
         refresh();
         infoDisplay.clear();
 
         switch (newState) {
-            case "default":
+            case DEFAULT:
                 timer.stop();
                 break;
-            case "running":
+            case RUNNING:
                 timer.start();
                 break;
-            case "adding":
+            case ADDING:
                 makeNewSegment();
                 break;
-            case "deleting":
+            case DELETING:
                 infoDisplay.displayMessage("Choose a segment to delete");
                 break;
-            case "editing":
+            case EDITING:
                 infoDisplay.displayMessage("Choose a segment to edit");
                 break;
         }
     }
 
-    public String getState() {
+    public RoutineScreenState getState() {
         return state;
     }
 
@@ -189,7 +189,7 @@ public class RoutineScreen extends Screen {
     // EFFECTS: Starts the editing dialog for a certain segment in the routine
     private void beginEditSegment(Segment segmentToEdit) {
         new AddEditDialog(app, segmentToEdit);
-        changeState("default");
+        changeState(RoutineScreenState.DEFAULT);
     }
 
     // MODIFIES: this
@@ -205,7 +205,7 @@ public class RoutineScreen extends Screen {
 
         // User cancelled out of making the new segment
         if (constructedSegment == null) {
-            changeState("default");
+            changeState(RoutineScreenState.DEFAULT);
             return;
         }
 
@@ -234,7 +234,7 @@ public class RoutineScreen extends Screen {
             routine.insertSegmentAfter(constructedSegment, segmentToInsertAround);
         }
 
-        changeState("default");
+        changeState(RoutineScreenState.DEFAULT);
     }
 
     // REQUIRES: segment is in routine
@@ -242,7 +242,7 @@ public class RoutineScreen extends Screen {
     // EFFECTS: Removes the segment from the routine
     private void deleteSegment(Segment segment) {
         routine.removeSegment(segment);
-        changeState("default");
+        changeState(RoutineScreenState.DEFAULT);
     }
 
     // --------------------------------------------------------------------------------------------
@@ -259,7 +259,7 @@ public class RoutineScreen extends Screen {
     // MODIFIES: this
     // EFFECTS: Advances the routine if it is running and on a manual segment
     public void advanceRoutineManual() {
-        if (state.equals("running")) {
+        if (state == RoutineScreenState.RUNNING) {
             routine.advance();
             refresh();
         }
@@ -274,13 +274,13 @@ public class RoutineScreen extends Screen {
     //          location, from a choosing state (i.e. deleting, editing, adding).
     public void clickedSegmentLocation(Segment segment, boolean topHalf) {
         switch (state) {
-            case "editing":
+            case EDITING:
                 beginEditSegment(segment);
                 break;
-            case "adding":
+            case ADDING:
                 addPremadeSegment(segment, topHalf);
                 break;
-            case "deleting":
+            case DELETING:
                 deleteSegment(segment);
                 break;
         }

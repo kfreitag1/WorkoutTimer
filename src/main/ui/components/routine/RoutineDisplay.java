@@ -4,6 +4,7 @@ import model.Routine;
 import model.Segment;
 import ui.components.ScrollableComponent;
 import ui.handlers.SegmentMouseHandler;
+import ui.screens.RoutineScreenState;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -15,7 +16,8 @@ public class RoutineDisplay extends ScrollableComponent {
 
     // EFFECTS: Constructs the routine display with the given routine, whether the routine
     //          is currently running or not, and a mouse handler to attach to the children segments
-    public RoutineDisplay(Routine routine, String routineState, SegmentMouseHandler mouseHandler) {
+    public RoutineDisplay(Routine routine, RoutineScreenState routineState,
+                          SegmentMouseHandler mouseHandler) {
         super();
         this.routine = routine;
         this.mouseHandler = mouseHandler;
@@ -28,7 +30,7 @@ public class RoutineDisplay extends ScrollableComponent {
     // MODIFIES: this
     // EFFECTS: Refreshes the routine display to show any changes made to the stored Routine
     //          objects. Completely replaces all the children SegmentDisplay views on each refresh
-    public void refresh(String routineState) {
+    public void refresh(RoutineScreenState routineState) {
         body.removeAll();
         if (routine.getSegments().isEmpty()) {
             addCenteredLabel("No segments yet!");

@@ -5,6 +5,7 @@ import model.Routine;
 import model.Segment;
 import model.TimeSegment;
 import ui.handlers.SegmentMouseHandler;
+import ui.screens.RoutineScreenState;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -23,17 +24,18 @@ public class SegmentDisplay extends JComponent {
     private final Routine routine;
     private final Segment segment;
     private String segmentState; // one of "default" "current" "complete"
-    private final String routineState; // one of "default" "running" "editing" "deleting" "adding"
+    private final RoutineScreenState routineState;
     private final SegmentMouseHandler mouseHandler;
 
     private Dimension mouseLocation = null; // only set when mouse is currently over this view
 
-    private JLabel infoText = new JLabel();
+    private final JLabel infoText = new JLabel();
 
     // REQUIRES: segment is in routine
     // EFFECTS: Constructs a view for a given segment in the given routine,
     //          modifies the display when the timer is running (isRunning is true)
-    SegmentDisplay(Routine routine, Segment segment, String routineState, SegmentMouseHandler mouseHandler) {
+    SegmentDisplay(Routine routine, Segment segment, RoutineScreenState routineState,
+                   SegmentMouseHandler mouseHandler) {
         super();
         this.segment = segment;
         this.routine = routine;
@@ -46,7 +48,7 @@ public class SegmentDisplay extends JComponent {
         addMouseMotionListener(mouseHandler);
 
         // Set cursor to hand if in a selecting state
-        if (routineState.equals("editing") || routineState.equals("adding") || routineState.equals("deleting")) {
+        if (routineState.isSelectingState()) {
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
 
@@ -100,7 +102,7 @@ public class SegmentDisplay extends JComponent {
     // MODIFIES: this
     // EFFECTS: Sets the layout for the bottom section specific for a manual segment
     private void initManualSegment() {
-        if (routineState.equals("running") && segmentState.equals("current")) {
+        if (routineState == RoutineScreenState.RUNNING && segmentState.equals("current")) {
             infoText.setText("Press space to complete!");
         }
     }
@@ -117,7 +119,8 @@ public class SegmentDisplay extends JComponent {
 
         // Progress bar in continuous amount
         add(Box.createRigidArea(new Dimension(0, UNIT_SIZE / 2)));
-        add(new ProgressBar(getAccuratePercentage(currentTime, totalTime), routineState.equals("running")));
+        add(new ProgressBar(getAccuratePercentage(currentTime, totalTime),
+                routineState == RoutineScreenState.RUNNING));
     }
 
     // MODIFIES: this
@@ -136,7 +139,7 @@ public class SegmentDisplay extends JComponent {
             percentage = getAccuratePercentage(currentCycle - 1, totalCycles);
         }
         add(Box.createRigidArea(new Dimension(0, UNIT_SIZE / 2)));
-        add(new ProgressBar(percentage, routineState.equals("running")));
+        add(new ProgressBar(percentage, routineState == RoutineScreenState.RUNNING));
 
         // Children segments
         JPanel childrenDisplay = new JPanel();
@@ -193,7 +196,7 @@ public class SegmentDisplay extends JComponent {
         int boxHeight = getHeight() - UNIT_SIZE;
 
         Color backgroundColor = DEFAULT_BACKGROUND_COLOR;
-        if (routineState.equals("running")) {
+        if (routineState == RoutineScreenState.RUNNING) {
             switch (segmentState) {
                 case "complete":
                     backgroundColor = COMPLETE_BACKGROUND_COLOR;
@@ -220,7 +223,7 @@ public class SegmentDisplay extends JComponent {
 
         // Paint overlay on hover if the mouse is over it and in a selecting routine state
         if (mouseLocation != null) {
-            if (!(routineState.equals("adding") || routineState.equals("editing") || routineState.equals("deleting"))) {
+            if (!routineState.isSelectingState()) {
                 return;
             }
 
@@ -229,7 +232,7 @@ public class SegmentDisplay extends JComponent {
             int endingHeight = getHeight();
 
             // Overlay just the top or bottom half of the segment to choose a location for adding
-            if (routineState.equals("adding")) {
+            if (routineState == RoutineScreenState.ADDING) {
                 boolean mouseOverTopHalf = mouseLocation.height < (getHeight() / 2);
 
                 startingHeight = mouseOverTopHalf ? 0 : getHeight() / 2;

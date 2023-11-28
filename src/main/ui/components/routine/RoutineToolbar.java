@@ -2,6 +2,7 @@ package ui.components.routine;
 
 import ui.handlers.PlayPauseButtonHandler;
 import ui.screens.RoutineScreen;
+import ui.screens.RoutineScreenState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -43,7 +44,7 @@ public class RoutineToolbar extends JPanel {
 
         initLayout();
         initEventHandlers();
-        updateToState("default");
+        updateToState(RoutineScreenState.DEFAULT);
     }
 
     // MODIFIES: this
@@ -70,28 +71,27 @@ public class RoutineToolbar extends JPanel {
     private void initEventHandlers() {
         playPauseButton.addActionListener(new PlayPauseButtonHandler(parentRoutineScreen));
         restartButton.addActionListener(e -> parentRoutineScreen.resetRoutine());
-        addButton.addActionListener(e -> parentRoutineScreen.changeState("adding"));
-        deleteButton.addActionListener(e -> parentRoutineScreen.changeState("deleting"));
-        editButton.addActionListener(e -> parentRoutineScreen.changeState("editing"));
+        addButton.addActionListener(e -> parentRoutineScreen.changeState(RoutineScreenState.ADDING));
+        deleteButton.addActionListener(e -> parentRoutineScreen.changeState(RoutineScreenState.DELETING));
+        editButton.addActionListener(e -> parentRoutineScreen.changeState(RoutineScreenState.EDITING));
         saveButton.addActionListener(e -> parentRoutineScreen.save());
         closeButton.addActionListener(e -> parentRoutineScreen.close());
     }
 
-    // REQUIRES: state is one of "default" "running" "editing" "deleting" "adding"
     // MODIFIES: this
     // EFFECTS: Modifies the appearance / interactivity of all the toolbar buttons
     //          based on the state of the RoutineScreen
-    public void updateToState(String state) {
+    public void updateToState(RoutineScreenState state) {
         switch (state) {
-            case "default":
+            case DEFAULT:
                 updateToDefaultState();
                 break;
-            case "running":
+            case RUNNING:
                 updateToRunningState();
                 break;
-            case "editing":
-            case "deleting":
-            case "adding":
+            case EDITING:
+            case DELETING:
+            case ADDING:
                 updateToChoosingState();
                 break;
             default:
