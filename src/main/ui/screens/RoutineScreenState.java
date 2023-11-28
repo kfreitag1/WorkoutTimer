@@ -9,6 +9,9 @@ public enum RoutineScreenState {
     ADDING,
     DELETING;
 
+    // EFFECTS: Returns true if the current state is a "selecting state",
+    //          i.e. one where the user is selecting something:
+    //          (editing, adding, or deleting)
     public boolean isSelectingState() {
         return (this == EDITING || this == ADDING || this == DELETING);
     }

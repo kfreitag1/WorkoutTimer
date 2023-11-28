@@ -3,6 +3,7 @@ package model;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.Encodable;
+import persistence.RoutineJsonKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -255,13 +256,13 @@ public class Routine implements SegmentList, Encodable {
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put("name", name);
+        object.put(RoutineJsonKey.NAME.toString(), name);
 
         JSONArray segments = new JSONArray();
         for (Segment segment : this.segments) {
             segments.put(segment.encoded());
         }
-        object.put("segments", segments);
+        object.put(RoutineJsonKey.SEGMENTS.toString(), segments);
 
         return object;
     }
