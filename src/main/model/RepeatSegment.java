@@ -2,6 +2,7 @@ package model;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import persistence.RoutineJsonKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -190,16 +191,16 @@ public class RepeatSegment implements Segment, SegmentList {
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put("type", getType().name());
-        object.put("name", name);
-        object.put("totalRepetitions", numRepeats);
-        object.put("currentRepetitions", currentCycle);
+        object.put(RoutineJsonKey.TYPE.toString(), getType().name());
+        object.put(RoutineJsonKey.NAME.toString(), name);
+        object.put(RoutineJsonKey.TOTAL_REPETITIONS.toString(), numRepeats);
+        object.put(RoutineJsonKey.CURRENT_REPETITIONS.toString(), currentCycle);
 
         JSONArray children = new JSONArray();
         for (Segment segment : this.children) {
             children.put(segment.encoded());
         }
-        object.put("children", children);
+        object.put(RoutineJsonKey.CHILDREN.toString(), children);
 
         return object;
     }

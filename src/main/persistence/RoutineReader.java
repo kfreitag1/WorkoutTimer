@@ -30,10 +30,10 @@ public class RoutineReader {
             String jsonData = readFile(sourceFilepath);
             JSONObject jsonObject = new JSONObject(jsonData);
 
-            String name = jsonObject.getString("name");
+            String name = jsonObject.getString(RoutineJsonKey.NAME.toString());
             Routine routine = new Routine(name);
 
-            for (Object object : jsonObject.getJSONArray("segments")) {
+            for (Object object : jsonObject.getJSONArray(RoutineJsonKey.SEGMENTS.toString())) {
                 Segment segment = readSegmentFromJson((JSONObject) object);
                 routine.addSegment(segment);
             }
@@ -50,26 +50,26 @@ public class RoutineReader {
     //          (i.e. does not conform to expected structure)
     private Segment readSegmentFromJson(JSONObject object) throws IOException {
         try {
-            String name = object.getString("name");
-            String typeString = object.getString("type");
+            String name = object.getString(RoutineJsonKey.NAME.toString());
+            String typeString = object.getString(RoutineJsonKey.TYPE.toString());
             SegmentType type = SegmentType.valueOf(typeString);
 
             if (type == SegmentType.TIME) {
-                long totalTime = object.getLong("totalTime");
-                long currentTime = object.getLong("currentTime");
+                long totalTime = object.getLong(RoutineJsonKey.TOTAL_TIME.toString());
+                long currentTime = object.getLong(RoutineJsonKey.CURRENT_TIME.toString());
                 return new TimeSegment(name, totalTime, currentTime);
             }
 
             if (type == SegmentType.MANUAL) {
-                boolean finished = object.getBoolean("finished");
+                boolean finished = object.getBoolean(RoutineJsonKey.FINISHED.toString());
                 return new ManualSegment(name, finished);
             }
 
             // Must be SegmentType.REPEAT since type is never null (would throw otherwise)
-            int totalRepetitions = object.getInt("totalRepetitions");
-            int currentRepetitions = object.getInt("currentRepetitions");
+            int totalRepetitions = object.getInt(RoutineJsonKey.TOTAL_REPETITIONS.toString());
+            int currentRepetitions = object.getInt(RoutineJsonKey.CURRENT_REPETITIONS.toString());
             List<Segment> children = new ArrayList<>();
-            for (Object subObject : object.getJSONArray("children")) {
+            for (Object subObject : object.getJSONArray(RoutineJsonKey.CHILDREN.toString())) {
                 children.add(readSegmentFromJson((JSONObject) subObject));
             }
             return new RepeatSegment(name, totalRepetitions, children, currentRepetitions);

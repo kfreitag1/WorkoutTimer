@@ -1,6 +1,7 @@
 package model;
 
 import org.json.JSONObject;
+import persistence.RoutineJsonKey;
 
 // Represents a Segment that is manually completed
 // i.e. the segment is only complete when it is manually set to be complete
@@ -72,9 +73,9 @@ public class ManualSegment implements Segment {
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put("type", getType().name());
-        object.put("name", name);
-        object.put("finished", finished);
+        object.put(RoutineJsonKey.TYPE.toString(), getType().name());
+        object.put(RoutineJsonKey.NAME.toString(), name);
+        object.put(RoutineJsonKey.FINISHED.toString(), finished);
         return object;
     }
 }

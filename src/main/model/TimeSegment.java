@@ -1,6 +1,7 @@
 package model;
 
 import org.json.JSONObject;
+import persistence.RoutineJsonKey;
 
 import static java.lang.Math.min;
 
@@ -102,10 +103,10 @@ public class TimeSegment implements Segment {
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put("type", getType().name());
-        object.put("name", name);
-        object.put("totalTime", totalTime);
-        object.put("currentTime", currentTime);
+        object.put(RoutineJsonKey.TYPE.toString(), getType().name());
+        object.put(RoutineJsonKey.NAME.toString(), name);
+        object.put(RoutineJsonKey.TOTAL_TIME.toString(), totalTime);
+        object.put(RoutineJsonKey.CURRENT_TIME.toString(), currentTime);
         return object;
     }
 }
