@@ -13,9 +13,9 @@ public class RoutineToolbar extends JPanel {
     private static final int ICON_HEIGHT = 15;
     private static final int UNIT_SIZE = 8;
 
-    private static final Icon PLAY_ICON = new PlayPauseRewindIcon("play", ICON_HEIGHT);
-    private static final Icon PAUSE_ICON = new PlayPauseRewindIcon("pause", ICON_HEIGHT);
-    private static final Icon REWIND_ICON = new PlayPauseRewindIcon("rewind", ICON_HEIGHT);
+    private static final Icon PLAY_ICON = new PlayPauseRewindIcon(PlayPauseRewindIcon.Type.PLAY, ICON_HEIGHT);
+    private static final Icon PAUSE_ICON = new PlayPauseRewindIcon(PlayPauseRewindIcon.Type.PAUSE, ICON_HEIGHT);
+    private static final Icon REWIND_ICON = new PlayPauseRewindIcon(PlayPauseRewindIcon.Type.REWIND, ICON_HEIGHT);
 
     private final ToolbarButton playPauseButton;
     private final ToolbarButton restartButton;

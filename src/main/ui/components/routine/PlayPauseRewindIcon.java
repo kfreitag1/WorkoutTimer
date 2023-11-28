@@ -10,18 +10,45 @@ import java.io.IOException;
 
 // Represents a high resolution play, pause, or rewind icon of a fixed height
 public class PlayPauseRewindIcon implements Icon {
-    public static final BufferedImage PLAY_IMAGE;
-    public static final BufferedImage PAUSE_IMAGE;
-    public static final BufferedImage REWIND_IMAGE;
+    // Represents the type of icon
+    public enum Type {
+        PLAY("./data/assets/play.png"),
+        PAUSE("./data/assets/pause.png"),
+        REWIND("./data/assets/rewind.png");
 
-    // Preload all the images for the icons
-    static {
-        try {
-            PLAY_IMAGE = ImageIO.read(new File("./data/assets/play.png"));
-            PAUSE_IMAGE = ImageIO.read(new File("./data/assets/pause.png"));
-            REWIND_IMAGE = ImageIO.read(new File("./data/assets/rewind.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        private final String iconImageFilePath;
+
+        private static final BufferedImage PLAY_IMAGE;
+        private static final BufferedImage PAUSE_IMAGE;
+        private static final BufferedImage REWIND_IMAGE;
+
+        // EFFECTS: Private constructor to make an icon type form an image filepath
+        Type(String iconImageFilePath) {
+            this.iconImageFilePath = iconImageFilePath;
+        }
+
+        static {
+            try {
+                // Preload all icon files
+                PLAY_IMAGE = ImageIO.read(new File(Type.PLAY.iconImageFilePath));
+                PAUSE_IMAGE = ImageIO.read(new File(Type.PAUSE.iconImageFilePath));
+                REWIND_IMAGE = ImageIO.read(new File(Type.REWIND.iconImageFilePath));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        // EFFECTS: Returns the cached image for the current icon type
+        public BufferedImage getBufferedImage() {
+            switch (this) {
+                case PLAY:
+                    return PLAY_IMAGE;
+                case PAUSE:
+                    return PAUSE_IMAGE;
+                case REWIND:
+                    return REWIND_IMAGE;
+            }
+            throw new IllegalStateException("Invalid icon type.");
         }
     }
 
@@ -29,22 +56,10 @@ public class PlayPauseRewindIcon implements Icon {
     final int height;
     final int width;
 
-    // REQUIRES: type is one of "play", "pause", "rewind", height > 0
+    // REQUIRES: height > 0
     // EFFECTS: Constructs a new play, pause, or rewind icon
-    public PlayPauseRewindIcon(String type, int height) {
-        switch (type) {
-            case "play":
-                image = PLAY_IMAGE;
-                break;
-            case "pause":
-                image = PAUSE_IMAGE;
-                break;
-            case "rewind":
-                image = REWIND_IMAGE;
-                break;
-            default:
-                throw new IllegalStateException("Invalid icon image type");
-        }
+    public PlayPauseRewindIcon(Type type, int height) {
+        image = type.getBufferedImage();
         this.height = height;
         this.width = scaledWidth(image, height);
     }
