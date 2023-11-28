@@ -14,6 +14,14 @@ import java.awt.*;
 // Represents a view that contains a Segment in a Routine
 // Meant to be a fixed representation of the segment, should be recreated when the segment changes
 public class SegmentDisplay extends JComponent {
+
+    // Represents the possible states of the segment display
+    private enum State {
+        DEFAULT,
+        CURRENT,
+        COMPLETE
+    }
+
     private static final int UNIT_SIZE = 8;
     private static final Color BORDER_COLOR = new Color(190, 190, 190);
     private static final Color DEFAULT_BACKGROUND_COLOR = new Color(250, 250, 250);
@@ -23,7 +31,7 @@ public class SegmentDisplay extends JComponent {
 
     private final Routine routine;
     private final Segment segment;
-    private String segmentState; // one of "default" "current" "complete"
+    private State segmentState;
     private final RoutineScreenState routineState;
     private final SegmentMouseHandler mouseHandler;
 
@@ -102,7 +110,7 @@ public class SegmentDisplay extends JComponent {
     // MODIFIES: this
     // EFFECTS: Sets the layout for the bottom section specific for a manual segment
     private void initManualSegment() {
-        if (routineState == RoutineScreenState.RUNNING && segmentState.equals("current")) {
+        if (routineState == RoutineScreenState.RUNNING && segmentState == State.CURRENT) {
             infoText.setText("Press space to complete!");
         }
     }
@@ -135,7 +143,7 @@ public class SegmentDisplay extends JComponent {
 
         // Percentage bar in discrete amounts
         double percentage = 1.0;
-        if (!segmentState.equals("complete")) {
+        if (segmentState != State.COMPLETE) {
             percentage = getAccuratePercentage(currentCycle - 1, totalCycles);
         }
         add(Box.createRigidArea(new Dimension(0, UNIT_SIZE / 2)));
@@ -159,11 +167,11 @@ public class SegmentDisplay extends JComponent {
     //          is complete or if its currently active
     private void determineSegmentState() {
         if (segment.isComplete()) {
-            segmentState = "complete";
+            segmentState = State.COMPLETE;
         } else if (segment.equals(routine.getExactCurrentSegment())) {
-            segmentState = "current";
+            segmentState = State.CURRENT;
         } else {
-            segmentState = "default";
+            segmentState = State.DEFAULT;
         }
     }
 
@@ -198,10 +206,10 @@ public class SegmentDisplay extends JComponent {
         Color backgroundColor = DEFAULT_BACKGROUND_COLOR;
         if (routineState == RoutineScreenState.RUNNING) {
             switch (segmentState) {
-                case "complete":
+                case COMPLETE:
                     backgroundColor = COMPLETE_BACKGROUND_COLOR;
                     break;
-                case "current":
+                case CURRENT:
                     backgroundColor = CURRENT_BACKGROUND_COLOR;
                     break;
             }
