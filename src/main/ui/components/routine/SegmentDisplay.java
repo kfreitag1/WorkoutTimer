@@ -65,13 +65,13 @@ public class SegmentDisplay extends JComponent {
 
         initTopSection();
         switch (segment.getType()) {
-            case "manual":
+            case MANUAL:
                 initManualSegment();
                 break;
-            case "repeat":
+            case REPEAT:
                 initRepeatSegment();
                 break;
-            case "time":
+            case TIME:
                 initTimeSegment();
                 break;
         }

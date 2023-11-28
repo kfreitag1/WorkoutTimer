@@ -109,7 +109,7 @@ public class Routine implements SegmentList, Encodable {
         // Search rest of the children/sub-children for it
         Segment parentToRemove = null;
         for (Segment child : segmentList) {
-            if (!child.getType().equals("repeat")) {
+            if (child.getType() != SegmentType.REPEAT) {
                 continue;
             }
             if (removeInSegmentList(segmentToRemove, ((RepeatSegment) child).getSegments())) {
@@ -142,7 +142,7 @@ public class Routine implements SegmentList, Encodable {
 
         // Search rest of children/sub-children for it
         for (Segment child : segmentList) {
-            if (child.getType().equals("repeat")) {
+            if (child.getType() == SegmentType.REPEAT) {
                 insertInSegmentList(segment, segmentToInsertAround,
                         ((RepeatSegment) child).getSegments(), insertAfter);
             }
@@ -160,9 +160,9 @@ public class Routine implements SegmentList, Encodable {
 
         Segment currentSegment = getExactCurrentSegment();
 
-        if (advanceManual && currentSegment.getType().equals("manual")) {
+        if (advanceManual && currentSegment.getType() == SegmentType.MANUAL) {
             ((ManualSegment) currentSegment).setComplete();
-        } else if (currentSegment.getType().equals("time")) {
+        } else if (currentSegment.getType() == SegmentType.TIME) {
             long remainingTime = ((TimeSegment) currentSegment).addTime(milliseconds);
             if (remainingTime != 0) {
                 advance(remainingTime);
@@ -197,7 +197,7 @@ public class Routine implements SegmentList, Encodable {
         List<Segment> allSegments = new ArrayList<>();
         for (Segment segment : getSegments()) {
             allSegments.add(segment);
-            if (segment.getType().equals("repeat")) {
+            if (segment.getType() == SegmentType.REPEAT) {
                 allSegments.addAll(((SegmentList) segment).getFlattenedSegments());
             }
         }

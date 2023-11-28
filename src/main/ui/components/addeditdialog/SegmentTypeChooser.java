@@ -1,6 +1,7 @@
 package ui.components.addeditdialog;
 
 import model.Segment;
+import model.SegmentType;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -23,17 +24,15 @@ public class SegmentTypeChooser extends JPanel {
         // Determine which radio button is selected, and whether they can be changed
         if (segmentToEdit != null) {
             switch (segmentToEdit.getType()) {
-                case "time":
+                case TIME:
                     timeRadio.setSelected(true);
                     break;
-                case "manual":
+                case MANUAL:
                     manualRadio.setSelected(true);
                     break;
-                case "repeat":
+                case REPEAT:
                     repeatRadio.setSelected(true);
                     break;
-                default:
-                    throw new IllegalStateException("Invalid segment type");
             }
 
             // Don't let user change the segment type of editing segment
@@ -51,15 +50,15 @@ public class SegmentTypeChooser extends JPanel {
     private void initLayout() {
         ButtonGroup segmentRadioGroup = new ButtonGroup();
 
-        timeRadio = makeRadioButton("Time", "time");
+        timeRadio = makeRadioButton("Time", SegmentType.TIME.name());
         add(timeRadio);
         segmentRadioGroup.add(timeRadio);
 
-        manualRadio = makeRadioButton("Manual", "manual");
+        manualRadio = makeRadioButton("Manual", SegmentType.MANUAL.name());
         add(manualRadio);
         segmentRadioGroup.add(manualRadio);
 
-        repeatRadio = makeRadioButton("Repeat", "repeat");
+        repeatRadio = makeRadioButton("Repeat", SegmentType.REPEAT.name());
         add(repeatRadio);
         segmentRadioGroup.add(repeatRadio);
     }

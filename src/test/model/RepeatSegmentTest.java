@@ -37,28 +37,28 @@ public class RepeatSegmentTest {
     @Test
     public void testConstruction() {
         assertEquals("only child parent", r1.getName());
-        assertEquals("repeat", r1.getType());
+        assertEquals(SegmentType.REPEAT, r1.getType());
         assertEquals(1, r1.getCurrentRepetition());
         assertEquals(1, r1.getTotalRepetitions());
         assertEquals(Arrays.asList(m1), r1.getSegments());
         assertFalse(r1.isComplete());
 
         assertEquals("parent of 3 kids", r2.getName());
-        assertEquals("repeat", r2.getType());
+        assertEquals(SegmentType.REPEAT, r2.getType());
         assertEquals(1, r2.getCurrentRepetition());
         assertEquals(2, r2.getTotalRepetitions());
         assertEquals(Arrays.asList(m1, t1, t2), r2.getSegments());
         assertFalse(r2.isComplete());
 
         assertEquals("level 1", r3.getName());
-        assertEquals("repeat", r3.getType());
+        assertEquals(SegmentType.REPEAT, r3.getType());
         assertEquals(1, r3.getCurrentRepetition());
         assertEquals(2, r3.getTotalRepetitions());
         assertEquals(Arrays.asList(r31), r3.getSegments());
         assertFalse(r3.isComplete());
 
         assertEquals("partially complete", r4.getName());
-        assertEquals("repeat", r4.getType());
+        assertEquals(SegmentType.REPEAT, r4.getType());
         assertEquals(2, r4.getCurrentRepetition());
         assertEquals(3, r4.getTotalRepetitions());
         assertEquals(Arrays.asList(m1), r4.getSegments());

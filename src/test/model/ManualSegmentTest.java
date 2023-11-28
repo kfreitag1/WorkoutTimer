@@ -16,14 +16,14 @@ public class ManualSegmentTest {
 
     @Test
     public void testConstruction() {
-        assertEquals("manual", m1.getType());
+        assertEquals(SegmentType.MANUAL, m1.getType());
         assertEquals("test name", m1.getName());
         assertFalse(m1.isComplete());
     }
 
     @Test
     public void testConstructionPartiallyComplete() {
-        assertEquals("manual", m2.getType());
+        assertEquals(SegmentType.MANUAL, m2.getType());
         assertEquals("other name", m2.getName());
         assertTrue(m2.isComplete());
     }

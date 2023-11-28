@@ -8,7 +8,7 @@ import persistence.Encodable;
 public interface Segment extends Encodable {
     String getName();
 
-    String getType();
+    SegmentType getType();
 
     boolean isComplete();
 

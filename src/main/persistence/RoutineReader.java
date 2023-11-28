@@ -1,6 +1,7 @@
 package persistence;
 
 import model.*;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -25,45 +26,56 @@ public class RoutineReader {
     //          throws IOException if an error occurs reading data from file
     //          (i.e. does not conform to expected structure)
     public Routine read() throws IOException {
-        String jsonData = readFile(sourceFilepath);
-        JSONObject jsonObject = new JSONObject(jsonData);
+        try {
+            String jsonData = readFile(sourceFilepath);
+            JSONObject jsonObject = new JSONObject(jsonData);
 
-        String name = jsonObject.getString("name");
-        Routine routine = new Routine(name);
+            String name = jsonObject.getString("name");
+            Routine routine = new Routine(name);
 
-        for (Object object : jsonObject.getJSONArray("segments")) {
-            Segment segment = readSegmentFromJson((JSONObject) object);
-            routine.addSegment(segment);
+            for (Object object : jsonObject.getJSONArray("segments")) {
+                Segment segment = readSegmentFromJson((JSONObject) object);
+                routine.addSegment(segment);
+            }
+
+            return routine;
+        } catch (JSONException e) {
+            // Catch JSONException and rethrow as IOException
+            throw new IOException(e.getMessage());
         }
-
-        return routine;
     }
 
     // EFFECTS: Reads and constructs a Segment from the provided JSON object
     //          throws IOException if an error occurs reading data from the object
     //          (i.e. does not conform to expected structure)
     private Segment readSegmentFromJson(JSONObject object) throws IOException {
-        String name = object.getString("name");
-        String type = object.getString("type");
+        try {
+            String name = object.getString("name");
+            String typeString = object.getString("type");
+            SegmentType type = SegmentType.valueOf(typeString);
 
-        switch (type) {
-            case "time":
+            if (type == SegmentType.TIME) {
                 long totalTime = object.getLong("totalTime");
                 long currentTime = object.getLong("currentTime");
                 return new TimeSegment(name, totalTime, currentTime);
-            case "manual":
+            }
+
+            if (type == SegmentType.MANUAL) {
                 boolean finished = object.getBoolean("finished");
                 return new ManualSegment(name, finished);
-            case "repeat":
-                int totalRepetitions = object.getInt("totalRepetitions");
-                int currentRepetitions = object.getInt("currentRepetitions");
-                List<Segment> children = new ArrayList<>();
-                for (Object subObject : object.getJSONArray("children")) {
-                    children.add(readSegmentFromJson((JSONObject) subObject));
-                }
-                return new RepeatSegment(name, totalRepetitions, children, currentRepetitions);
-            default:
-                throw new IOException();
+            }
+
+            // Must be SegmentType.REPEAT since type is never null (would throw otherwise)
+            int totalRepetitions = object.getInt("totalRepetitions");
+            int currentRepetitions = object.getInt("currentRepetitions");
+            List<Segment> children = new ArrayList<>();
+            for (Object subObject : object.getJSONArray("children")) {
+                children.add(readSegmentFromJson((JSONObject) subObject));
+            }
+            return new RepeatSegment(name, totalRepetitions, children, currentRepetitions);
+        } catch (Exception e) {
+            // Catch JSONException and IllegalArgumentException and rethrow as IOException
+            throw new IOException(e.getMessage());
         }
     }
 

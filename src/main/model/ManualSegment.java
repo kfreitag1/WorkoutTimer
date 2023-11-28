@@ -43,8 +43,8 @@ public class ManualSegment implements Segment {
     }
 
     @Override
-    public String getType() {
-        return "manual";
+    public SegmentType getType() {
+        return SegmentType.MANUAL;
     }
 
     // EFFECTS: Returns true only if the segment is complete
@@ -72,7 +72,7 @@ public class ManualSegment implements Segment {
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put("type", getType());
+        object.put("type", getType().name());
         object.put("name", name);
         object.put("finished", finished);
         return object;

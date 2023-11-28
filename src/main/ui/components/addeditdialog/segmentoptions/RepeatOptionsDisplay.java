@@ -2,6 +2,7 @@ package ui.components.addeditdialog.segmentoptions;
 
 import model.RepeatSegment;
 import model.Segment;
+import model.SegmentType;
 import ui.components.addeditdialog.Updatable;
 import ui.components.ValidatedTextField;
 import ui.screens.AddEditDialog;
@@ -27,7 +28,7 @@ public class RepeatOptionsDisplay extends OptionsDisplay {
         // Validated text field for number of cycles
         // Set a default value if editing a segment
         String defaultCycles = "";
-        if (segmentToEdit != null && segmentToEdit.getType().equals("repeat")) {
+        if (segmentToEdit != null && segmentToEdit.getType() == SegmentType.REPEAT) {
             defaultCycles = Integer.toString(((RepeatSegment) segmentToEdit).getTotalRepetitions());
         }
         cyclesEntry = new ValidatedTextField("[1-9]\\d*", updateCallback, defaultCycles);

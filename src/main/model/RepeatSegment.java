@@ -112,8 +112,8 @@ public class RepeatSegment implements Segment, SegmentList {
     }
 
     @Override
-    public String getType() {
-        return "repeat";
+    public SegmentType getType() {
+        return SegmentType.REPEAT;
     }
 
     // EFFECTS: Returns if the segment is complete, i.e. on the last cycle and the last
@@ -161,7 +161,7 @@ public class RepeatSegment implements Segment, SegmentList {
         List<Segment> allSegments = new ArrayList<>();
         for (Segment child : getSegments()) {
             allSegments.add(child);
-            if (child.getType().equals("repeat")) {
+            if (child.getType() == SegmentType.REPEAT) {
                 allSegments.addAll(((RepeatSegment) child).getFlattenedSegments());
             }
         }
@@ -190,7 +190,7 @@ public class RepeatSegment implements Segment, SegmentList {
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put("type", getType());
+        object.put("type", getType().name());
         object.put("name", name);
         object.put("totalRepetitions", numRepeats);
         object.put("currentRepetitions", currentCycle);

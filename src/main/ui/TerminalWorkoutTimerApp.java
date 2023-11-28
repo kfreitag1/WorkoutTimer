@@ -319,11 +319,11 @@ public class TerminalWorkoutTimerApp {
                 ".+", segmentToEdit.getName()));
 
         switch (segmentToEdit.getType()) {
-            case "time":
+            case TIME:
                 TimeSegment timeSegment = (TimeSegment) segmentToEdit;
                 timeSegment.setTotalTime(getTimeWithValidation());
                 break;
-            case "repeat":
+            case REPEAT:
                 RepeatSegment repeatSegment = (RepeatSegment) segmentToEdit;
                 repeatSegment.setNewRepeats(getIntegerWithValidation("New number of repetitions (1 to 1000): ",
                         1, 1000, Integer.toString(repeatSegment.getTotalRepetitions())));
@@ -710,14 +710,14 @@ public class TerminalWorkoutTimerApp {
     //          segment is (could be null if no valid active segment).
     private String displayTextForSegment(Segment segment, boolean isActive, Segment activeSegment) {
         switch (segment.getType()) {
-            case "time":
+            case TIME:
                 TimeSegment timeSegment = (TimeSegment) segment;
                 String currentTimeString = millisecondsToPrettyTime(timeSegment.getCurrentTime(), true);
                 String totalTimeString = millisecondsToPrettyTime(timeSegment.getTotalTime(), false);
                 return currentTimeString + " / " + totalTimeString;
-            case "manual":
+            case MANUAL:
                 return isActive && segment.equals(activeSegment) ? "Press space to continue!" : "";
-            case "repeat":
+            case REPEAT:
                 RepeatSegment repeatSegment = (RepeatSegment) segment;
                 return repeatSegment.getCurrentRepetition() + "/" + repeatSegment.getTotalRepetitions();
         }

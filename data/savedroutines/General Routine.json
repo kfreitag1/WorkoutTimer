@@ -5,12 +5,12 @@
             "currentTime": 0,
             "totalTime": 3000,
             "name": "Push ups",
-            "type": "time"
+            "type": "TIME"
         },
         {
             "name": "10x Sit ups",
             "finished": false,
-            "type": "manual"
+            "type": "MANUAL"
         },
         {
             "currentRepetitions": 1,
@@ -19,13 +19,13 @@
                     "currentTime": 0,
                     "totalTime": 2000,
                     "name": "Plank",
-                    "type": "time"
+                    "type": "TIME"
                 },
                 {
                     "currentTime": 0,
                     "totalTime": 1000,
                     "name": "Rest",
-                    "type": "time"
+                    "type": "TIME"
                 },
                 {
                     "currentRepetitions": 1,
@@ -34,28 +34,28 @@
                             "currentTime": 0,
                             "totalTime": 2000,
                             "name": "Jumping Jacks",
-                            "type": "time"
+                            "type": "TIME"
                         },
                         {
                             "name": "Untimed Rest",
                             "finished": false,
-                            "type": "manual"
+                            "type": "MANUAL"
                         }
                     ],
                     "totalRepetitions": 2,
                     "name": "Sub-circuit",
-                    "type": "repeat"
+                    "type": "REPEAT"
                 }
             ],
             "totalRepetitions": 3,
             "name": "Circuit",
-            "type": "repeat"
+            "type": "REPEAT"
         },
         {
             "currentTime": 0,
             "totalTime": 3000,
             "name": "Cooldown",
-            "type": "time"
+            "type": "TIME"
         }
     ]
 }

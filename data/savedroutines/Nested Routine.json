@@ -16,30 +16,30 @@
                                 "currentTime": 0,
                                 "totalTime": 1000,
                                 "name": "Timed segment",
-                                "type": "time"
+                                "type": "TIME"
                             }],
                             "totalRepetitions": 2,
                             "name": "Level 6",
-                            "type": "repeat"
+                            "type": "REPEAT"
                         }],
                         "totalRepetitions": 2,
                         "name": "Level 5",
-                        "type": "repeat"
+                        "type": "REPEAT"
                     }],
                     "totalRepetitions": 2,
                     "name": "Level 4",
-                    "type": "repeat"
+                    "type": "REPEAT"
                 }],
                 "totalRepetitions": 2,
                 "name": "Level 3",
-                "type": "repeat"
+                "type": "REPEAT"
             }],
             "totalRepetitions": 2,
             "name": "Level 2",
-            "type": "repeat"
+            "type": "REPEAT"
         }],
         "totalRepetitions": 2,
         "name": "Level 1",
-        "type": "repeat"
+        "type": "REPEAT"
     }]
 }

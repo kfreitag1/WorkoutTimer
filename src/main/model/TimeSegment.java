@@ -72,8 +72,8 @@ public class TimeSegment implements Segment {
     }
 
     @Override
-    public String getType() {
-        return "time";
+    public SegmentType getType() {
+        return SegmentType.TIME;
     }
 
     // EFFECTS: Returns if the segment is complete, i.e. the elapsed time is equal
@@ -102,7 +102,7 @@ public class TimeSegment implements Segment {
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put("type", getType());
+        object.put("type", getType().name());
         object.put("name", name);
         object.put("totalTime", totalTime);
         object.put("currentTime", currentTime);

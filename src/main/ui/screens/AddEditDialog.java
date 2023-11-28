@@ -1,9 +1,6 @@
 package ui.screens;
 
-import model.ManualSegment;
-import model.RepeatSegment;
-import model.Segment;
-import model.TimeSegment;
+import model.*;
 import ui.components.Validatable;
 import ui.components.ValidatedTextField;
 import ui.components.addeditdialog.*;
@@ -121,19 +118,8 @@ public class AddEditDialog extends JDialog implements Updatable, Validatable {
     //          the state of the segment option panel.
     private JComponent makeSegmentTypeChooser() {
         return new SegmentTypeChooser(e -> {
-            switch (e.getActionCommand()) {
-                case "time":
-                    segmentTypeOptions.changeState("time");
-                    break;
-                case "manual":
-                    segmentTypeOptions.changeState("manual");
-                    break;
-                case "repeat":
-                    segmentTypeOptions.changeState("repeat");
-                    break;
-                default:
-                    throw new IllegalStateException("Invalid state for radio buttons");
-            }
+            SegmentType type = SegmentType.valueOf(e.getActionCommand());
+            segmentTypeOptions.changeState(type);
         }, segmentToEdit);
     }
 
@@ -218,27 +204,21 @@ public class AddEditDialog extends JDialog implements Updatable, Validatable {
     private Segment makeSegment() {
         assert (checkValid());
 
-        Segment segment;
         String name = nameField.getText().trim();
 
         switch (segmentTypeOptions.getState()) {
-            case "time":
+            case TIME:
                 long time = segmentTypeOptions.getTime();
-                segment = new TimeSegment(name, time);
-                break;
-            case "manual":
-                segment = new ManualSegment(name);
-                break;
-            case "repeat":
+                return new TimeSegment(name, time);
+            case MANUAL:
+                return new ManualSegment(name);
+            case REPEAT:
                 int numCycles = segmentTypeOptions.getNumCycles();
                 List<Segment> children = segmentTypeOptions.getSegments();
-                segment = new RepeatSegment(name, numCycles, children);
-                break;
+                return new RepeatSegment(name, numCycles, children);
             default:
                 throw new IllegalStateException("Segment type is invalid");
         }
-
-        return segment;
     }
 
     // REQUIRES: checkValid is true, segmentToEdit is not null
@@ -250,13 +230,13 @@ public class AddEditDialog extends JDialog implements Updatable, Validatable {
         segmentToEdit.setName(nameField.getText().trim());
 
         switch (segmentTypeOptions.getState()) {
-            case "time":
+            case TIME:
                 TimeSegment timeSegmentToEdit = (TimeSegment) segmentToEdit;
                 timeSegmentToEdit.setTotalTime(segmentTypeOptions.getTime());
                 break;
-            case "manual":
+            case MANUAL:
                 break;
-            case "repeat":
+            case REPEAT:
                 RepeatSegment repeatSegmentToEdit = (RepeatSegment) segmentToEdit;
                 repeatSegmentToEdit.setNewRepeats(segmentTypeOptions.getNumCycles());
                 break;

@@ -19,19 +19,19 @@ public class TimeSegmentTest {
     @Test
     public void testConstruction() {
         assertEquals("no time", t1.getName());
-        assertEquals("time", t1.getType());
+        assertEquals(SegmentType.TIME, t1.getType());
         assertEquals(0, t1.getTotalTime());
         assertEquals(0, t1.getCurrentTime());
         assertTrue(t1.isComplete());
 
         assertEquals("two seconds", t2.getName());
-        assertEquals("time", t2.getType());
+        assertEquals(SegmentType.TIME, t2.getType());
         assertEquals(2000, t2.getTotalTime());
         assertEquals(0, t2.getCurrentTime());
         assertFalse(t2.isComplete());
 
         assertEquals("partially complete", t4.getName());
-        assertEquals("time", t4.getType());
+        assertEquals(SegmentType.TIME, t4.getType());
         assertEquals(100, t4.getTotalTime());
         assertEquals(90, t4.getCurrentTime());
         assertFalse(t4.isComplete());

@@ -1,6 +1,7 @@
 package ui.components.addeditdialog;
 
 import model.Segment;
+import model.SegmentType;
 import ui.components.Validatable;
 import ui.components.addeditdialog.segmentoptions.ManualOptionsDisplay;
 import ui.components.addeditdialog.segmentoptions.RepeatOptionsDisplay;
@@ -21,7 +22,7 @@ public class SegmentTypeOptions extends JPanel implements Validatable {
     private final RepeatOptionsDisplay repeatOptions;
 
     // Default state is time
-    private String state = "time";
+    private SegmentType state = SegmentType.TIME;
 
     // EFFECTS: Constructs a new container view for the segment type options
     public SegmentTypeOptions(Updatable updateCallback, Segment segmentToEdit, JDialog parent) {
@@ -35,9 +36,9 @@ public class SegmentTypeOptions extends JPanel implements Validatable {
         repeatOptions = new RepeatOptionsDisplay(updateCallback, segmentToEdit, parent);
 
         // Add them to the layout
-        add(timeOptions, "time");
-        add(manualOptions, "manual");
-        add(repeatOptions, "repeat");
+        add(timeOptions, SegmentType.TIME.name());
+        add(manualOptions, SegmentType.MANUAL.name());
+        add(repeatOptions, SegmentType.REPEAT.name());
 
         // If editing a preexisting segment, set the panel to be its type,
         // otherwise it will be "time" by default for a new segment
@@ -48,7 +49,7 @@ public class SegmentTypeOptions extends JPanel implements Validatable {
 
     // MODIFIES: this
     // EFFECTS: Changes the state (view displayed) and updates any callback objects
-    public void changeState(String newState) {
+    public void changeState(SegmentType newState) {
         setState(newState);
         updateCallback.update();
     }
@@ -56,12 +57,12 @@ public class SegmentTypeOptions extends JPanel implements Validatable {
     // MODIFIES: this
     // EFFECTS: Internal helper to change the state and update the layout to display the
     //          options panel corresponding to the new state.
-    private void setState(String newState) {
+    private void setState(SegmentType newState) {
         state = newState;
-        layout.show(this, newState);
+        layout.show(this, newState.name());
     }
 
-    public String getState() {
+    public SegmentType getState() {
         return state;
     }
 
@@ -70,11 +71,11 @@ public class SegmentTypeOptions extends JPanel implements Validatable {
     @Override
     public boolean checkValid() {
         switch (state) {
-            case "time":
+            case TIME:
                 return timeOptions.checkValid();
-            case "manual":
+            case MANUAL:
                 return manualOptions.checkValid();
-            case "repeat":
+            case REPEAT:
                 return repeatOptions.checkValid();
             default:
                 throw new IllegalStateException("Invalid segment type");

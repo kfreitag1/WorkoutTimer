@@ -5,7 +5,7 @@
             "currentTime": 10000,
             "totalTime": 10000,
             "name": "Time1",
-            "type": "time"
+            "type": "TIME"
         },
         {
             "currentRepetitions": 1,
@@ -13,7 +13,7 @@
                 {
                     "name": "Manual1",
                     "finished": true,
-                    "type": "manual"
+                    "type": "MANUAL"
                 },
                 {
                     "currentRepetitions": 2,
@@ -21,29 +21,29 @@
                         {
                             "name": "Manual2",
                             "finished": true,
-                            "type": "manual"
+                            "type": "MANUAL"
                         },
                         {
                             "currentTime": 2000,
                             "totalTime": 4000,
                             "name": "Time2",
-                            "type": "time"
+                            "type": "TIME"
                         }
                     ],
                     "totalRepetitions": 4,
                     "name": "Repeat2",
-                    "type": "repeat"
+                    "type": "REPEAT"
                 },
                 {
                     "currentTime": 0,
                     "totalTime": 5000,
                     "name": "Time3",
-                    "type": "time"
+                    "type": "TIME"
                 }
             ],
             "totalRepetitions": 2,
             "name": "Repeat1",
-            "type": "repeat"
+            "type": "REPEAT"
         }
     ]
 }

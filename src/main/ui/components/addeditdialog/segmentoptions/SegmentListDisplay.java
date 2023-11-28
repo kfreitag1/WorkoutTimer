@@ -2,6 +2,7 @@ package ui.components.addeditdialog.segmentoptions;
 
 import model.RepeatSegment;
 import model.Segment;
+import model.SegmentType;
 import ui.components.ScrollableComponent;
 import ui.components.addeditdialog.Updatable;
 import ui.components.Validatable;
@@ -26,7 +27,7 @@ public class SegmentListDisplay extends ScrollableComponent implements Validatab
 
         // If editing a pre-existing segment, set the child segment elements
         // otherwise make a new empty list
-        if (isEditing && segmentToEdit.getType().equals("repeat")) {
+        if (isEditing && segmentToEdit.getType() == SegmentType.REPEAT) {
             segments = ((RepeatSegment) segmentToEdit).getSegments();
         } else {
             segments = new ArrayList<>();

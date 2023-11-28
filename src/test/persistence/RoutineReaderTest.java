@@ -4,6 +4,7 @@ import model.ManualSegment;
 import model.RepeatSegment;
 import model.Routine;
 import model.TimeSegment;
+import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -39,11 +40,19 @@ public class RoutineReaderTest {
     }
 
     @Test
-    void testReaderInvalidRoutine() {
+    void testReaderInvalidRoutines() {
         RoutineReader reader = new RoutineReader("./data/testReaderInvalidRoutine.json");
         try {
             reader.read();
-            fail("Should have thrown an exception when encountered invalid segment type");
+            fail("Should have thrown IOException when encountered no routine name");
+        } catch (IOException e) {
+            // pass
+        }
+
+        RoutineReader reader2 = new RoutineReader("./data/testReaderInvalidSegmentTypeRoutine.json");
+        try {
+            reader2.read();
+            fail("Should have thrown IOException when decoding invalid segment type");
         } catch (IOException e) {
             // pass
         }
