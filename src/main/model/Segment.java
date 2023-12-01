@@ -3,7 +3,7 @@ package model;
 import persistence.Encodable;
 
 // Classes which implement Segment represents one segment of a procedure in a
-// Routine instance (or other class which implements SegmentList).
+// Routine instance (or other class which implements SegmentGroup).
 // I.e. Each segment of the procedure implements the following methods.
 public abstract class Segment implements Encodable {
     private String name;
@@ -19,6 +19,11 @@ public abstract class Segment implements Encodable {
 
     public void setName(String newName) {
         this.name = newName;
+    }
+
+    // EFFECTS: Updates the state of the segment (only used for SegmentGroup instances)
+    public void update() {
+        // do nothing
     }
 
     // --------------------------------------------------------------------------------------------

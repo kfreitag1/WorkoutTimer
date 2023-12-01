@@ -81,7 +81,7 @@ public class RepeatSegmentTest {
 
         // current cycle = new num repetitions
         ((ManualSegment) r1.getSegments().get(0)).setComplete();
-        r1.updateRepeatCycle(); // should be on cycle 2 now
+        r1.update(); // should be on cycle 2 now
         r1.setNewRepeats(2);
         assertEquals(2, r1.getTotalRepetitions());
         assertEquals(2, r1.getCurrentRepetition());
@@ -99,14 +99,14 @@ public class RepeatSegmentTest {
         List<Segment> kids = r2.getSegments();
 
         // No children complete, does NOT need to increase cycle number
-        r2.updateRepeatCycle();
+        r2.update();
         assertEquals(1, r2.getCurrentRepetition());
         assertFalse(r2.isComplete());
 
         // Only some children complete, does NOT need to increase cycle number
         ((ManualSegment) kids.get(0)).setComplete();          // first child complete
         ((TimeSegment) kids.get(1)).addTime(2000); // second child complete
-        r2.updateRepeatCycle();
+        r2.update();
         assertEquals(1, r2.getCurrentRepetition());
         assertFalse(r2.isComplete());
         assertTrue(kids.get(0).isComplete()); // Only first two kids are complete
@@ -115,7 +115,7 @@ public class RepeatSegmentTest {
 
         // All children are complete, does need to increase
         ((TimeSegment) kids.get(2)).addTime(1000); // third child complete
-        r2.updateRepeatCycle();
+        r2.update();
         assertEquals(2, r2.getCurrentRepetition());
         assertFalse(r2.isComplete());
         assertFalse(kids.get(0).isComplete()); // Should reset states of the kids
@@ -126,7 +126,7 @@ public class RepeatSegmentTest {
         ((ManualSegment) kids.get(0)).setComplete();          // first child complete again
         ((TimeSegment) kids.get(1)).addTime(2000); // second child complete again
         ((TimeSegment) kids.get(2)).addTime(1000); // third child complete again
-        r2.updateRepeatCycle();
+        r2.update();
         assertEquals(2, r2.getCurrentRepetition());
         assertTrue(r2.isComplete());
         assertTrue(kids.get(0).isComplete()); // Should reset states of the kids
@@ -161,7 +161,7 @@ public class RepeatSegmentTest {
         ((ManualSegment) kids.get(0)).setComplete();          // first child complete
         ((TimeSegment) kids.get(1)).addTime(2000); // second child complete
         ((TimeSegment) kids.get(2)).addTime(1000); // third child complete
-        r2.updateRepeatCycle(); // now on cycle 2/2
+        r2.update(); // now on cycle 2/2
         r2.reset();
         assertEquals(1, r2.getCurrentRepetition());
         assertEquals(2, r2.getTotalRepetitions());
@@ -174,7 +174,7 @@ public class RepeatSegmentTest {
         ((ManualSegment) kids.get(0)).setComplete();          // first child complete
         ((TimeSegment) kids.get(1)).addTime(2000); // second child complete
         ((TimeSegment) kids.get(2)).addTime(1000); // third child complete
-        r2.updateRepeatCycle(); // now on cycle 2/2
+        r2.update(); // now on cycle 2/2
         ((ManualSegment) kids.get(0)).setComplete();          // first child complete again
         ((TimeSegment) kids.get(1)).addTime(2000); // second child complete again
         assertFalse(r2.isComplete());
@@ -190,7 +190,7 @@ public class RepeatSegmentTest {
         ((ManualSegment) kids.get(0)).setComplete();          // first child complete
         ((TimeSegment) kids.get(1)).addTime(2000); // second child complete
         ((TimeSegment) kids.get(2)).addTime(1000); // third child complete
-        r2.updateRepeatCycle(); // now on cycle 2/2
+        r2.update(); // now on cycle 2/2
         ((ManualSegment) kids.get(0)).setComplete();          // first child complete again
         ((TimeSegment) kids.get(1)).addTime(2000); // second child complete again
         ((TimeSegment) kids.get(2)).addTime(1000); // third child complete again
@@ -232,7 +232,7 @@ public class RepeatSegmentTest {
 
         // IMPOSSIBLE CONDITION ALL CHILDREN COMPLETE ON FINAL CYCLE (VIOLATES REQUIRES CLAUSE)
         ((TimeSegment) r2.getSegments().get(2)).addTime(800);  // third child complete
-        r2.updateRepeatCycle();
+        r2.update();
         ((ManualSegment) r2.getSegments().get(0)).setComplete();          // first child complete again
         ((TimeSegment) r2.getSegments().get(1)).addTime(2000); // second child complete again
         ((TimeSegment) r2.getSegments().get(2)).addTime(1000); // third child complete again

@@ -5,29 +5,24 @@ import org.json.JSONObject;
 import persistence.Encodable;
 import persistence.RoutineJsonKey;
 
-import java.util.ArrayList;
 import java.util.List;
 
 // Represents a single routine which contains a procedure (list) of segments which can be,
 // added, inserted, deleted, advanced (by time or manually).
-public class Routine implements SegmentList, Encodable {
-    private String name;
-    private final List<Segment> segments;
+public class Routine extends SegmentGroup implements Encodable {
+    // EFFECTS: Constructs a routine with the given name and an empty list of segments.
+    public Routine(String name) {
+        super(name);
+    }
 
     // --------------------------------------------------------------------------------------------
     // Public methods
     // --------------------------------------------------------------------------------------------
 
-    // EFFECTS: Constructs a routine with the given name and an empty list of segments.
-    public Routine(String name) {
-        this.name = name;
-        segments = new ArrayList<>();
-    }
-
     // MODIFIES: this
     // EFFECTS: Adds the given segment to the end of segments
     public void addSegment(Segment segment) {
-        segments.add(segment);
+        getSegments().add(segment);
         EventLog.getInstance().logEvent(new Event("Added a segment with name: " + segment.getName()));
     }
 
@@ -36,7 +31,7 @@ public class Routine implements SegmentList, Encodable {
     // EFFECTS: Inserts the given segment at the index in segments (or a sub-list) BEFORE the other
     //          specified segment.
     public void insertSegmentBefore(Segment segment, Segment segmentToInsertBefore) {
-        insertInSegmentList(segment, segmentToInsertBefore, segments, false);
+        insertInSegmentList(segment, segmentToInsertBefore, getSegments(), false);
         EventLog.getInstance().logEvent(new Event(
                 "Inserted new segment with name: " + segment.getName() + ", before segment: "
                         + segmentToInsertBefore.getName()));
@@ -47,7 +42,7 @@ public class Routine implements SegmentList, Encodable {
     // EFFECTS: Inserts the given segment at the index in segments (or a sub-list) AFTER the other
     //          specified segment.
     public void insertSegmentAfter(Segment segment, Segment segmentToInsertAfter) {
-        insertInSegmentList(segment, segmentToInsertAfter, segments, true);
+        insertInSegmentList(segment, segmentToInsertAfter, getSegments(), true);
         EventLog.getInstance().logEvent(new Event(
                 "Inserted new segment with name: " + segment.getName() + ", after segment: "
                         + segmentToInsertAfter.getName()));
@@ -58,7 +53,7 @@ public class Routine implements SegmentList, Encodable {
     // EFFECTS: Removes the given segment from wherever it is in segments. ALSO removes any invalid
     //          repeat segments that would have no children after performing this operation.
     public void removeSegment(Segment segment) {
-        removeInSegmentList(segment, segments);
+        removeInSegmentList(segment, getSegments());
         EventLog.getInstance().logEvent(new Event("Removed segment with name: " + segment.getName()));
     }
 
@@ -84,10 +79,12 @@ public class Routine implements SegmentList, Encodable {
     public Segment getExactCurrentSegment() {
         Segment exactCurrentSegment = getCurrentSegment();
 
-        // Check all the way down until not a repeat segment
-        while (exactCurrentSegment instanceof RepeatSegment) {
-            exactCurrentSegment = ((RepeatSegment) exactCurrentSegment).getCurrentSegment();
+        // Check all the way down until not a SegmentGroup
+        while (exactCurrentSegment instanceof SegmentGroup) {
+            SegmentGroup segmentGroup = (SegmentGroup) exactCurrentSegment;
+            exactCurrentSegment = segmentGroup.getCurrentSegment();
         }
+
         return exactCurrentSegment;
     }
 
@@ -110,10 +107,10 @@ public class Routine implements SegmentList, Encodable {
         // Search rest of the children/sub-children for it
         Segment parentToRemove = null;
         for (Segment child : segmentList) {
-            if (child.getType() != SegmentType.REPEAT) {
+            if (!(child instanceof SegmentGroup)) {
                 continue;
             }
-            if (removeInSegmentList(segmentToRemove, ((RepeatSegment) child).getSegments())) {
+            if (removeInSegmentList(segmentToRemove, ((SegmentGroup) child).getSegments())) {
                 parentToRemove = child;
                 break;
             }
@@ -143,9 +140,9 @@ public class Routine implements SegmentList, Encodable {
 
         // Search rest of children/sub-children for it
         for (Segment child : segmentList) {
-            if (child.getType() == SegmentType.REPEAT) {
+            if (child instanceof SegmentGroup) {
                 insertInSegmentList(segment, segmentToInsertAround,
-                        ((RepeatSegment) child).getSegments(), insertAfter);
+                        ((SegmentGroup) child).getSegments(), insertAfter);
             }
         }
     }
@@ -172,94 +169,25 @@ public class Routine implements SegmentList, Encodable {
     }
 
     // --------------------------------------------------------------------------------------------
-    // SegmentList methods
+    // Segment implementation
     // --------------------------------------------------------------------------------------------
 
-    // MODIFIES: this
-    // EFFECTS: Returns the segments list, ensuring that all segments are updated.
     @Override
-    public List<Segment> getSegments() {
-        // Update all the repeat segments if necessary
-        for (Segment segment : segments) {
-            if (segment instanceof RepeatSegment) {
-                ((RepeatSegment) segment).updateRepeatCycle();
-            }
-        }
-        return segments;
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Returns a new flattened list of the segments. I.e. the children segment list
-    //          is a list that can contain other lists, a flattened list would be the one-dimensional
-    //          list with each segment in order (depth-first traversal). Ensures all segments are
-    //          updated as well.
-    @Override
-    public List<Segment> getFlattenedSegments() {
-        List<Segment> allSegments = new ArrayList<>();
-        for (Segment segment : getSegments()) {
-            allSegments.add(segment);
-            if (segment.getType() == SegmentType.REPEAT) {
-                allSegments.addAll(((SegmentList) segment).getFlattenedSegments());
-            }
-        }
-        return allSegments;
-    }
-
-    // REQUIRES: isComplete() is false;
-    // MODIFIES: this
-    // EFFECTS: Returns the segment that is currently active (MAY be a RepeatSegment).
-    //          Ensures that all segments are updated.
-    @Override
-    public Segment getCurrentSegment() {
-        for (Segment segment : getSegments()) {
-            if (!segment.isComplete()) {
-                return segment;
-            }
-        }
-        throw new IllegalStateException("All segments were complete, violates requires clause");
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Resets all segments to their initial states.
-    @Override
-    public void reset() {
-        for (Segment segment : segments) {
-            segment.reset();
-        }
-    }
-
-    // MODIFIES: this
-    // EFFECTS: Returns if the segment is complete, i.e. either no segments or the last
-    //          child segment is complete. Ensures all segments are updated.
-    @Override
-    public boolean isComplete() {
-        if (segments.isEmpty()) {
-            return true;
-        }
-        return getSegments().get(segments.size() - 1).isComplete();
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String newName) {
-        this.name = newName;
+    public SegmentType getType() {
+        return SegmentType.ROUTINE;
     }
 
     // --------------------------------------------------------------------------------------------
-    // Encodable methods
+    // Encodable implementation
     // --------------------------------------------------------------------------------------------
 
     @Override
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
-        object.put(RoutineJsonKey.NAME.toString(), name);
+        object.put(RoutineJsonKey.NAME.toString(), getName());
 
         JSONArray segments = new JSONArray();
-        for (Segment segment : this.segments) {
+        for (Segment segment : getSegments()) {
             segments.put(segment.encoded());
         }
         object.put(RoutineJsonKey.SEGMENTS.toString(), segments);

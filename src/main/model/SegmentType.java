@@ -3,5 +3,6 @@ package model;
 public enum SegmentType {
     MANUAL,
     TIME,
-    REPEAT
+    REPEAT,
+    ROUTINE
 }
