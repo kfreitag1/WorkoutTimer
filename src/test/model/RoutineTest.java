@@ -51,6 +51,7 @@ public class RoutineTest {
         assertEquals("empty routine", rn1.getName());
         assertTrue(rn1.getSegments().isEmpty());
         assertTrue(rn1.isComplete());
+        assertEquals(SegmentType.ROUTINE, rn1.getType());
     }
 
     @Test
