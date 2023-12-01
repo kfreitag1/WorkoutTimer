@@ -6,8 +6,7 @@ import persistence.RoutineJsonKey;
 import static java.lang.Math.min;
 
 // Represents a Segment that is completed after a certain amount of time
-public class TimeSegment implements Segment {
-    private String name;
+public class TimeSegment extends Segment {
     private long totalTime;
     private long currentTime;
 
@@ -26,7 +25,7 @@ public class TimeSegment implements Segment {
     // EFFECTS: Constructs a partially completed time segment with the given name, total time (in milliseconds),
     //          and the given time elapsed.
     public TimeSegment(String name, long totalTime, long currentTime) {
-        this.name = name;
+        super(name);
         this.totalTime = totalTime;
         this.currentTime = currentTime;
     }
@@ -68,11 +67,6 @@ public class TimeSegment implements Segment {
     // --------------------------------------------------------------------------------------------
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
     public SegmentType getType() {
         return SegmentType.TIME;
     }
@@ -91,11 +85,6 @@ public class TimeSegment implements Segment {
         currentTime = 0;
     }
 
-    @Override
-    public void setName(String newName) {
-        this.name = newName;
-    }
-
     // --------------------------------------------------------------------------------------------
     // Encodable methods
     // --------------------------------------------------------------------------------------------
@@ -104,7 +93,7 @@ public class TimeSegment implements Segment {
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
         object.put(RoutineJsonKey.TYPE.toString(), getType().name());
-        object.put(RoutineJsonKey.NAME.toString(), name);
+        object.put(RoutineJsonKey.NAME.toString(), getName());
         object.put(RoutineJsonKey.TOTAL_TIME.toString(), totalTime);
         object.put(RoutineJsonKey.CURRENT_TIME.toString(), currentTime);
         return object;

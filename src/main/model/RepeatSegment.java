@@ -11,8 +11,7 @@ import static java.lang.Math.min;
 
 // Represents a Segment that repeats a list of children segments
 // for a certain number of times
-public class RepeatSegment implements Segment, SegmentList {
-    private String name;
+public class RepeatSegment extends Segment implements SegmentList {
     private int numRepeats;
     private int currentCycle;
 
@@ -34,7 +33,7 @@ public class RepeatSegment implements Segment, SegmentList {
     // EFFECTS: Constructs a partially completed repeat segment with the given name,
     //          number of repetitions, list of children Segments, and current cycle number
     public RepeatSegment(String name, int numRepeats, List<Segment> children, int currentCycle) {
-        this.name = name;
+        super(name);
         this.numRepeats = numRepeats;
         this.children = children;
         this.currentCycle = currentCycle;
@@ -108,11 +107,6 @@ public class RepeatSegment implements Segment, SegmentList {
     // --------------------------------------------------------------------------------------------
 
     @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
     public SegmentType getType() {
         return SegmentType.REPEAT;
     }
@@ -132,11 +126,6 @@ public class RepeatSegment implements Segment, SegmentList {
         for (Segment child : children) {
             child.reset();
         }
-    }
-
-    @Override
-    public void setName(String newName) {
-        name = newName;
     }
 
     // --------------------------------------------------------------------------------------------
@@ -192,7 +181,7 @@ public class RepeatSegment implements Segment, SegmentList {
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
         object.put(RoutineJsonKey.TYPE.toString(), getType().name());
-        object.put(RoutineJsonKey.NAME.toString(), name);
+        object.put(RoutineJsonKey.NAME.toString(), getName());
         object.put(RoutineJsonKey.TOTAL_REPETITIONS.toString(), numRepeats);
         object.put(RoutineJsonKey.CURRENT_REPETITIONS.toString(), currentCycle);
 

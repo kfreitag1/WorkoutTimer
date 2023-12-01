@@ -5,14 +5,29 @@ import persistence.Encodable;
 // Classes which implement Segment represents one segment of a procedure in a
 // Routine instance (or other class which implements SegmentList).
 // I.e. Each segment of the procedure implements the following methods.
-public interface Segment extends Encodable {
-    String getName();
+public abstract class Segment implements Encodable {
+    private String name;
 
-    SegmentType getType();
+    // EFFECTS: Constructs a new segment with the given name
+    public Segment(String name) {
+        this.name = name;
+    }
 
-    boolean isComplete();
+    public String getName() {
+        return name;
+    }
 
-    void reset();
+    public void setName(String newName) {
+        this.name = newName;
+    }
 
-    void setName(String newName);
+    // --------------------------------------------------------------------------------------------
+    // Abstract methods
+    // --------------------------------------------------------------------------------------------
+
+    public abstract SegmentType getType();
+
+    public abstract boolean isComplete();
+
+    public abstract void reset();
 }

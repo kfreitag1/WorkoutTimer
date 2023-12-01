@@ -5,8 +5,7 @@ import persistence.RoutineJsonKey;
 
 // Represents a Segment that is manually completed
 // i.e. the segment is only complete when it is manually set to be complete
-public class ManualSegment implements Segment {
-    private String name;
+public class ManualSegment extends Segment {
     private boolean finished;
 
     // --------------------------------------------------------------------------------------------
@@ -20,7 +19,7 @@ public class ManualSegment implements Segment {
 
     // EFFECTS: Constructs a potentially completed manual segment with the given name and completion state
     public ManualSegment(String name, boolean finished) {
-        this.name = name;
+        super(name);
         this.finished = finished;
     }
 
@@ -37,11 +36,6 @@ public class ManualSegment implements Segment {
     // --------------------------------------------------------------------------------------------
     // Segment methods
     // --------------------------------------------------------------------------------------------
-
-    @Override
-    public String getName() {
-        return name;
-    }
 
     @Override
     public SegmentType getType() {
@@ -61,11 +55,6 @@ public class ManualSegment implements Segment {
         finished = false;
     }
 
-    @Override
-    public void setName(String newName) {
-        name = newName;
-    }
-
     // --------------------------------------------------------------------------------------------
     // Encodable methods
     // --------------------------------------------------------------------------------------------
@@ -74,7 +63,7 @@ public class ManualSegment implements Segment {
     public JSONObject encoded() {
         JSONObject object = new JSONObject();
         object.put(RoutineJsonKey.TYPE.toString(), getType().name());
-        object.put(RoutineJsonKey.NAME.toString(), name);
+        object.put(RoutineJsonKey.NAME.toString(), getName());
         object.put(RoutineJsonKey.FINISHED.toString(), finished);
         return object;
     }
