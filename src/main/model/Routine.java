@@ -9,7 +9,7 @@ import java.util.List;
 
 // Represents a single routine which contains a procedure (list) of segments which can be,
 // added, inserted, deleted, advanced (by time or manually).
-public class Routine extends SegmentGroup implements Encodable {
+public class Routine extends SegmentGroup {
     // EFFECTS: Constructs a routine with the given name and an empty list of segments.
     public Routine(String name) {
         super(name);

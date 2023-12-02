@@ -85,4 +85,41 @@ Representative event log:
 
   Removed segment with name: Push-ups
 
+## Phase 4: Task 3
+
+Overall, although the UML diagram looks fairly complicated, I believe that it represents a fairly simple code 
+structure. Most of the complexity is in the ui package, which is inherent for complex UI-based applications, and 
+even so the components are fairly modular. I tried to design the classes so that they are cohesive and only modify 
+other classes through defined callback functions.
+
+Completed Refactoring:
+- Added in enum classes where I needed a data type that represents one of a discrete number of options. Previously I 
+  would use strings to store this data, but enums are more accurate and less prone to making errors (e.g. need to 
+  remember the exact string used for each option). I often used switch statements to check the value of each of 
+  these data types and would need to include a 'default' option since strings could store values other than the 
+  discrete number of options I needed. I thought that when I switched over to enums I would be able to remove this 
+  'default' options since it should be a compiler error for an enum to hold a value other than one of the defined 
+  ones... but it seems that in Java this is not the case, you still need the default case when it would be 
+  impossible for it to occur.
+  - Added SegmentType to represent the types of the segments (MANUAL, TIME, REPEAT, ROUTINE)
+  - Added RoutineScreenState to represent the possible states of the routine screen (DEFAULT, RUNNING, EDITING, ADDING, DELETING)
+  - Added PlayPauseRewindIcon.Type to represent the possible icon types (PLAY, PAUSE, REWIND)
+  - Added SegmentDisplay.State to represent the possible states of the segment display (DEFAULT, CURRENT, COMPLETE)
+  - Added RoutineJsonJey to represent the possible JSON keys for different data types
+- The 'Segment' classes and Routine were very similar to the composite pattern since RepeatSegment and Routine 
+  objects could store lists of segments (which could also be RepeatSegments). I refactored this to be much more 
+  explicit by making Segment and SegmentGroup abstract classes that represent the component and composite classes in 
+  the composite pattern, respectively. Routine and RepeatSegment now extend from SegmentGroup (the composite). 
+  ManualSegment and TimeSegment continue to extend from Segment (they act as leaf classes). This allowed me to 
+  remove a lot of code duplication.
+
+Refactoring TODO:
+- There are a lot of constants throughout the application, so it might be nice to put these in one single location. 
+  Could make a singleton, or a static class to store these values.
+- I chose to make use of 'requires' clauses instead of exceptions in most cases where the input to a function needs 
+  to be of a certain state. I believe this is the best approach for this application since the code is only executed 
+  from other internal functions (i.e. not creating an external library). However, it might be beneficial to add in 
+  assert statements throughout to verify that these 'requires' classes are being met during further development.
+
+
 
