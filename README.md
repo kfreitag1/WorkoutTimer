@@ -29,9 +29,10 @@ example:*
 4. Cooking / baking
 
 
-<div align="center" style="display: flex; flex-direction: column">
-<img src="readme_assets/binary.gif" width="300px" style="margin: 0 auto" />
-<i>Accidental binary counting in a deeply nested routine of repeat segments??</i>
-</div>
+<p align="center">
+  <img src="readme_assets/binary.gif" width="300px" style="margin: 0 auto" />
+  <br />
+  <i>Accidental binary counting in a deeply nested routine of repeat segments??</i>
+</p>
 
 
